@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>学生门户 - Student Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'SimHei';
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 40px;
+            background-attachment: fixed;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #93c5fd;
+            text-decoration: none;
+            font-size: 1rem;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 6px;
+        }
+        
+        .back-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            text-decoration: none;
+            color: #ffd700;
+            transform: translateX(-3px);
+        }
+        
+        .back-link i {
+            margin-right: 5px;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            font-weight: 300;
+        }
+        
+        .chinese-title {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .english-title {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        .chinese-subtitle {
+            font-size: 1.1rem;
+            color: #e2e8f0;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        
+        .english-subtitle {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        .agents {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .agent-card {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 30px 25px;
+            border-radius: 15px;
+            width: 300px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .agent-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+        
+        .agent-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .agent-card h3 {
+            font-size: 1.5rem;
+            margin: 15px 0 15px;
+            color: #ffd700;
+        }
+        
+        .agent-card .chinese-name {
+            font-size: 1.5rem;
+            margin: 10px 0 5px;
+            color: #ffd700;
+        }
+        
+        .agent-card .english-name {
+            font-size: 1.2rem;
+            margin: 5px 0 10px;
+            color: #a0aec0;
+        }
+        
+        .agent-card p {
+            font-size: 1rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .agent-card .chinese-desc {
+            font-size: 1rem;
+            color: #e2e8f0;
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+        
+        .agent-card .english-desc {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .features {
+            margin-top: 20px;
+            text-align: left;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .features .chinese-features-title {
+            font-size: 1.1rem;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        
+        .features .english-features-title {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 10px;
+        }
+        
+        .features ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        .features li {
+            margin-bottom: 10px;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+        
+        .features .chinese-feature {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+            margin-bottom: 3px;
+        }
+        
+        .features .english-feature {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        
+        .features li:before {
+            content: "•";
+            color: #ffd700;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 1024px) {
+            .agents {
+                gap: 25px;
+            }
+            
+            .agent-card {
+                width: 280px;
+                padding: 25px 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .agents {
+                gap: 20px;
+            }
+            
+            .agent-card {
+                width: 100%;
+                max-width: 350px;
+                padding: 25px 20px;
+            }
+            
+            .agent-card h3 {
+                font-size: 1.4rem;
+            }
+            
+            .agent-card p {
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .header {
+                margin-bottom: 30px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .agent-card {
+                padding: 20px 15px;
+            }
+            
+            .agent-icon {
+                font-size: 2.5rem;
+            }
+            
+            .agent-card h3 {
+                font-size: 1.3rem;
+            }
+            
+            .agent-card p {
+                font-size: 0.9rem;
+            }
+            
+            .features li {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回首页 - Back to Home</a>
+        <div class="chinese-title"><i class="fas fa-graduation-cap"></i> 学生门户</div>
+        <div class="english-title">Student Portal</div>
+        <div class="chinese-subtitle">选择您想要使用的AI助手</div>
+        <div class="english-subtitle">Select the AI agent you want to use</div>
+    </div>
+    <div class="agents">
+        <div class="agent-card" onclick="location.href='agent-companion.html'">
+            <div class="agent-icon">
+                <i class="fas fa-robot"></i>
+            </div>
+            <div class="chinese-name">SADP智能伴学</div>
+            <div class="english-name">SADP Intelligent Learning Companion</div>
+            <div class="chinese-desc">AI驱动的个性化学习辅助系统</div>
+            <div class="english-desc">AI-driven personalized learning assistance system</div>
+            <div class="features">
+                <div class="chinese-features-title">功能特点</div>
+                <div class="english-features-title">Features</div>
+                <ul>
+                    <li>
+                        <div class="chinese-feature">多模态输入支持</div>
+                        <div class="english-feature">Multi-modal input support</div>
+                    </li>
+                    <li>
+                        <div class="chinese-feature">苏格拉底提问法</div>
+                        <div class="english-feature">Socratic questioning method</div>
+                    </li>
+                    <li>
+                        <div class="chinese-feature">个性化学习路径</div>
+                        <div class="english-feature">Personalized learning paths</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="agent-card" onclick="location.href='agent-coach.html'">
+            <div class="agent-icon">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <div class="chinese-name">SADP智能代码编程教练</div>
+            <div class="english-name">SADP Intelligent Coding Coach</div>
+            <div class="chinese-desc">智能代码分析与编程指导系统</div>
+            <div class="english-desc">Intelligent code analysis and programming guidance system</div>
+            <div class="features">
+                <div class="chinese-features-title">功能特点</div>
+                <div class="english-features-title">Features</div>
+                <ul>
+                    <li>
+                        <div class="chinese-feature">代码质量评估</div>
+                        <div class="english-feature">Code quality assessment</div>
+                    </li>
+                    <li>
+                        <div class="chinese-feature">设计模式推荐</div>
+                        <div class="english-feature">Design pattern recommendations</div>
+                    </li>
+                    <li>
+                        <div class="chinese-feature">重构指导</div>
+                        <div class="english-feature">Refactoring guidance</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="copyright">
+        <p>西安邮电大学 拓守恒教授教学团队（队员 何红副教授，刘海燕博士）</p>
+        <p>Xi'an University of Posts and Telecommunications Professor Shouheng Tuo's Teaching Team (Members: Associate Professor Hong He, Dr. Haiyan Liu)</p>
+    </div>
+</body>
+</html>

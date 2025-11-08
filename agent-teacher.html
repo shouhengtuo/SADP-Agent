@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SADP教学伴侣 - SADP Teaching Assistant Companion</title>
+    <!-- Coze SDK -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.4.0/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                fontSize: 22, // 节点文字大小
+                fontSizeSmall: 22, // 小文字大小
+                labelFontSize: 22 // 标签文字大小
+            },
+            flowchart: {
+                useMaxWidth: false, // 允许图表扩展到容器宽度
+                htmlLabels: true,
+                curve: 'linear',
+                nodeSpacing: 60, // 增加节点间距以适应更大的文字
+                rankSpacing: 80, // 增加层级间距以适应更大的文字
+                fontSize: 22
+            },
+            width: '100%',
+            height: '70%', // 进一步减小高度，避免图表过高
+            padding: 30
+        });
+    </script>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        /* Mermaid 图表容器样式 */
+        .mermaid {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            overflow: auto;
+            font-size: 22px !important;
+        }
+        
+        /* 确保 mermaid 图表填满容器 */
+        .mermaid svg {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        /* 强制设置节点和标签文字大小 */
+        .mermaid text {
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'SimHei';
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #f1f5f9;
+            background-attachment: fixed;
+        }
+        
+        .header {
+            background: rgba(30, 41, 59, 0.95);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 215, 0, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover { 
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .main-layout { 
+            display: flex; 
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .panel { 
+            padding: 25px; 
+            overflow-y: auto; 
+        }
+        
+        .left-panel {
+            width: 380px;
+            background: rgba(30, 41, 59, 0.9);
+            color: #f1f5f9;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .center-panel {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .right-panel {
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 41, 59, 0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .team-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .team-info h3 { 
+            margin-bottom: 12px; 
+            color: #ffd700; 
+            font-size: 1.2rem;
+        }
+        
+        .section-title { 
+            color: #ffd700; 
+            margin: 20px 0 15px; 
+            font-size: 1.4rem; 
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .section-title .chinese {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .section-title .english {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        ul {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .chinese-item {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .english-item {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 12px;
+        }
+        
+        li:before {
+            content: "•";
+            color: #ffd700;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        table { 
+            width: 100%; 
+            margin: 15px 0; 
+            font-size: 0.95rem;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td { 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            padding: 12px; 
+            text-align: left; 
+        }
+        
+        th { 
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .chinese-th, .chinese-td {
+            font-size: 0.95rem;
+        }
+        
+        .english-th, .english-td {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+        
+        .workflow-svg {
+            min-width: 600px;
+            min-height: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .chat-header {
+            padding: 15px;
+            background: rgba(30, 41, 59, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffd700;
+        }
+        
+        .chat-header .chinese {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+        
+        .chat-header .english {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        .info-item {
+            margin: 12px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .info-item strong {
+            color: #ffd700;
+        }
+        
+        .info-item .chinese {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .info-item .english {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+        
+        .personalized-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .personalized-box h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .personalized-box .chinese {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .personalized-box .english {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .feature-card h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .feature-card .chinese {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .feature-card .english {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 300px;
+            }
+            
+            .right-panel {
+                width: 100%;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .left-panel {
+                max-height: 250px;
+            }
+            
+            .team-info {
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 0.85rem;
+            }
+            
+            .workflow-svg {
+                min-width: 90%;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .panel {
+                padding: 10px;
+            }
+            
+            .left-panel {
+                max-height: 200px;
+            }
+            
+            .team-info {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+            
+            ul {
+                padding-left: 15px;
+            }
+            
+            li {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .workflow-svg {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2><i class="fas fa-chalkboard"></i> SADP教学伴侣 - SADP Teaching Assistant Companion</h2>
+        <button class="back-btn" onclick="location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> 返回首页 - Back to Home
+        </button>
+    </div>
+
+    <div class="main-layout">
+        <!-- 左侧：文档 + 团队 -->
+        <div class="panel left-panel">
+            <div class="team-info">
+                <h3><i class="fas fa-book"></i> 课程信息 - Course Information</h3>
+                <p><strong>课程名称 - Course Name:</strong> 软件架构与设计模式 - Software Architecture and Design Patterns</p>
+                <h3><i class="fas fa-users"></i> 设计团队 - Design Team</h3>
+                <p>西安邮电大学 拓守恒教授教学团队（队员 何红副教授，刘海燕博士）</p>
+                <p>Xi'an University of Posts and Telecommunications Professor Shouheng Tuo's Teaching Team (Members: Associate Professor Hong He, Dr. Haiyan Liu)</p>
+            </div>
+            
+            <div class="info-item">
+                <div class="chinese"><strong>工作流名称:</strong> SADP_tasks_generate</div>
+                <div class="english"><strong>Workflow Name:</strong> SADP_tasks_generate</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="chinese"><strong>核心理念:</strong> 解放教师，聚焦高阶教学创新</div>
+                <div class="english"><strong>Core Concept:</strong> Liberate teachers, focus on high-level teaching innovation</div>
+            </div>
+            
+            <div class="personalized-box">
+                <div class="chinese"><h3>个性化教学助手</h3></div>
+                <div class="english"><h3>Personalized Teaching Assistant</h3></div>
+                <p>专为软件架构与设计模式课程定制的AI教学助手，帮助教师自动生成教学材料、智能批改作业、分析考试结果。</p>
+                <p>Customized AI teaching assistant for Software Architecture and Design Patterns course, helping teachers generate teaching materials, grade assignments intelligently, and analyze exam results.</p>
+            </div>
+            
+            <h2 class="section-title">
+                <div class="chinese"><i class="fas fa-bullseye"></i> 核心功能</div>
+                <div class="english">Core Functions</div>
+            </h2>
+            <ul>
+                <li>
+                    <div class="chinese-item">✅ PPT自动生成（含PlantUML图表）</div>
+                    <div class="english-item">✅ PPT auto-generation (with PlantUML diagrams)</div>
+                </li>
+                <li>
+                    <div class="chinese-item">✅ 作业/报告智能批改</div>
+                    <div class="english-item">✅ Assignment/report intelligent grading</div>
+                </li>
+                <li>
+                    <div class="chinese-item">✅ 实验任务自动生成</div>
+                    <div class="english-item">✅ Experimental task auto-generation</div>
+                </li>
+                <li>
+                    <div class="chinese-item">✅ 试卷分析与成绩报告</div>
+                    <div class="english-item">✅ Exam paper analysis and achievement report</div>
+                </li>
+            </ul>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>多模型协作</h4></div>
+                <div class="english"><h4>Multi-model Collaboration</h4></div>
+                <p>Kimi-K2（长文本处理）与DeepSeek-V3.1（批改评分）协同工作，提供高效准确的教学辅助。</p>
+                <p>Kimi-K2 (long text processing) and DeepSeek-V3.1 (grading) work together to provide efficient and accurate teaching assistance.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>插件化架构</h4></div>
+                <div class="english"><h4>Plugin-based Architecture</h4></div>
+                <p>集成PPTGO、file_parse、excleParser等插件，扩展功能灵活便捷。</p>
+                <p>Integrated with PPTGO, file_parse, excleParser plugins for flexible and convenient feature extension.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>知识库增强</h4></div>
+                <div class="english"><h4>Knowledge Base Enhancement</h4></div>
+                <p>动态检索"SADP课程大纲"知识库，确保教学内容的准确性和时效性。</p>
+                <p>Dynamic retrieval of "SADP Course Outline" knowledge base to ensure the accuracy and timeliness of teaching content.</p>
+            </div>
+        </div>
+
+        <!-- 中间：Mermaid 工作流图 -->
+        <div class="panel center-panel" style="position: relative;">
+            <div class="mermaid" style="width: 100%; height: 100%;">
+                flowchart TD
+                    A[Start<br>开始: 教学任务] -->|初始化| B[Task Type Recognition<br>任务类型识别]
+                    B -->|领域分析| C[Knowledge Domain<br>知识领域识别]
+                    C -->|目标策略| D[Learning Goals & Strategy<br>学习目标与策略选择]
+                    
+                    D -->|内容生成| E[Content Generation<br>内容生成]
+                    D -->|评估方法| F[Learning Assessment<br>学习评估]
+                    
+                    E -->|内容整合| G[Teaching Plan Generation<br>教学计划生成]
+                    F -->|评估整合| G
+                    
+                    G -->|输出| H[End<br>结束]
+                    
+                    classDef startEnd fill:#dcfce7,stroke:#10b981,stroke-width:2px,color:#1e3a8a,font-weight:bold
+                    classDef process fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e293b
+                    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#1e293b
+                    
+                    class A,H startEnd
+                    class B,C,D,E,F,G process
+            </div>
+        </div>
+
+        <!-- 右侧：嵌入智能体 -->
+        <div class="panel right-panel">
+            <div class="chat-header">
+                <div class="chinese"><i class="fas fa-comments"></i> 教学助手 · 实时聊天</div>
+                <div class="english">Teaching Assistant · Live Chat</div>
+            </div>
+            <div id="coze-container" style="flex:1;">请点击下方蓝色的coze图标，开始与教学助手进行实时聊天。</div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Coze 智能体（嵌入模式）
+        const client = new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7569411366311378979',
+                mode: 'embedded' // 设置为嵌入模式
+            },
+            componentProps: {
+                title: 'Teaching Assistant',
+                container: document.getElementById('coze-container'),
+                showTitle: false,
+                width: '100%',
+                height: '100%',
+                enableFullScreenChat: true
+            },
+            auth: {
+                type: 'token',
+                token: 'pat_mQPUVvdmkS2mFiOi4U6ixZMofBAxBFtU15qrGJjXJvXG0TeUfG4sNiUvhp7H8gF4',
+                onRefreshToken: () => 'pat_mQPUVvdmkS2mFiOi4U6ixZMofBAxBFtU15qrGJjXJvXG0TeUfG4sNiUvhp7H8gF4'
+            }
+        });
+
+        // 移除自动打开聊天窗口的代码，让智能体直接嵌入在页面中
+    </script>
+</body>
+</html>

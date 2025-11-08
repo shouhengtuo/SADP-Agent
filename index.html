@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI赋能新教学体验 - AI-Powered Teaching Experience</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'SimHei';
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+        
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 50px 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            max-width: 800px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            color: #e2e8f0;
+            font-weight: 300;
+        }
+        
+        .roles {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .role {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 35px 25px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 220px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .role:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .role i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+        
+        .role h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffffff;
+        }
+        
+        .role .chinese {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: #ffffff;
+        }
+        
+        .role .english {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #a0aec0;
+        }
+        
+        .role p {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        
+        .role .chinese-desc {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            margin-bottom: 5px;
+        }
+        
+        .role .english-desc {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .copyright {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            color: #94a3b8;
+            text-align: center;
+        }
+        
+        .highlight {
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .roles {
+                gap: 25px;
+            }
+            
+            .role {
+                width: 100%;
+                max-width: 250px;
+                padding: 25px 15px;
+            }
+            
+            .role i {
+                font-size: 2.5rem;
+            }
+            
+            .role h2 {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                padding: 25px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .roles {
+                gap: 20px;
+            }
+            
+            .role {
+                width: 100%;
+                max-width: none;
+                padding: 20px 15px;
+            }
+            
+            .role i {
+                font-size: 2rem;
+            }
+            
+            .role h2 {
+                font-size: 1.2rem;
+            }
+            
+            .role p {
+                font-size: 0.9rem;
+            }
+            
+            .footer {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SADP智能教育系统 - AI-Powered Education System</h1>
+        <div class="subtitle">软件架构与设计模式 (Software Architecture and Design Patterns)</div>
+        
+        <!-- 快速入口 -->
+        <div class="roles">
+            <div class="role" onclick="location.href='teacher.html'">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <div class="chinese">教师门户</div>
+                <div class="english">Teacher Portal</div>
+                <div class="chinese-desc">访问AI驱动的教学助手和工具</div>
+                <div class="english-desc">Access AI-powered teaching assistants and tools</div>
+            </div>
+            <div class="role" onclick="location.href='student.html'">
+                <i class="fas fa-graduation-cap"></i>
+                <div class="chinese">学生门户</div>
+                <div class="english">Student Portal</div>
+                <div class="chinese-desc">连接智能学习伙伴</div>
+                <div class="english-desc">Connect with intelligent learning companions</div>
+            </div>
+            <div class="role" onclick="location.href='#features'">
+                <i class="fas fa-cogs"></i>
+                <div class="chinese">系统功能</div>
+                <div class="english">System Features</div>
+                <div class="chinese-desc">三大智能体介绍与说明</div>
+                <div class="english-desc">Three AI agents introduction</div>
+            </div>
+        </div>
+        
+        <!-- 系统功能介绍 -->
+        <div id="features" style="margin-top: 50px; text-align: left; max-width: 700px; margin-left: auto; margin-right: auto;">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">🔹 系统功能介绍</h2>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #ffffff; margin-bottom: 10px;">1. SADP智能伴学 (Learning Companion)</h3>
+                <p style="color: #cbd5e1; margin-bottom: 5px;">• 学习资料解析与问答</p>
+                <p style="color: #cbd5e1; margin-bottom: 5px;">• 文档、图片内容理解</p>
+                <p style="color: #cbd5e1;">• 智能问题生成与解答</p>
+            </div>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                <h3 style="color: #ffffff; margin-bottom: 10px;">2. SADP智能代码编程教练 (Coding Coach)</h3>
+                <p style="color: #cbd5e1; margin-bottom: 5px;">• 代码分析与优化建议</p>
+                <p style="color: #cbd5e1; margin-bottom: 5px;">• 设计模式识别与应用</p>
+                <p style="color: #cbd5e1;">• 编程问题诊断与解决方案</p>
+            </div>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px;">
+                <h3 style="color: #ffffff; margin-bottom: 10px;">3. SADP教学伴侣 (Teaching Assistant)</h3>
+                <p style="color: #cbd5e1; margin-bottom: 5px;">• 教学计划生成</p>
+                <p style="color: #cbd5e1; margin-bottom: 5px;">• 学习目标与策略制定</p>
+                <p style="color: #cbd5e1;">• 教学内容与评估方法推荐</p>
+            </div>
+        </div>
+        
+        <!-- 部署说明 -->
+        <div id="deploy" style="margin-top: 50px; text-align: left; max-width: 700px; margin-left: auto; margin-right: auto;">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">🔹 部署与使用指南</h2>
+            
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px;">
+                <p style="color: #ffffff; margin-bottom: 15px; font-weight: 600;">本系统为开源项目，您可以轻松部署使用：</p>
+                
+                <div style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-family: monospace;">
+                    <p style="color: #e2e8f0; margin-bottom: 10px;">1. 下载项目代码到本地</p>
+                    <p style="color: #e2e8f0; margin-bottom: 10px;">2. 启动本地服务器：</p>
+                    <p style="color: #94a3b8;">   python -m http.server 8000</p>
+                    <p style="color: #e2e8f0; margin-bottom: 10px; margin-top: 10px;">3. 在浏览器访问：http://localhost:8000</p>
+                    <p style="color: #e2e8f0;">4. 或部署到GitHub Pages、Netlify等平台</p>
+                </div>
+                
+                <p style="color: #cbd5e1; margin-bottom: 10px;">🔸 开源协议：MIT License</p>
+                <p style="color: #cbd5e1;">🔸 所有智能体已配置为嵌入模式，支持全屏聊天功能</p>
+            </div>
+        </div>
+        
+        <!-- 立即体验按钮 -->
+        <div style="text-align: center; margin-top: 40px;">
+            <button onclick="location.href='student.html'" style="background: linear-gradient(135deg, #ffd700, #ffb700); color: #1e3c72; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; margin-right: 15px;">
+                立即体验学习伙伴
+            </button>
+            <button onclick="location.href='teacher.html'" style="background: linear-gradient(135deg, #ffd700, #ffb700); color: #1e3c72; border: none; padding: 12px 24px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
+                立即体验教学助手
+            </button>
+        </div>
+        
+        <div class="footer">
+            <p>通过人工智能赋能教育 - Empowering Education Through <span class="highlight">Artificial Intelligence</span></p>
+        </div>
+        
+        <div class="copyright">
+            <p>西安邮电大学 拓守恒教授教学团队（队员 何红副教授，刘海燕博士）</p>
+            <p>Xi'an University of Posts and Telecommunications Professor Shouheng Tuo's Teaching Team (Members: Associate Professor Hong He, Dr. Haiyan Liu)</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; color: #a0aec0;">© 2023 本系统开源免费使用 · Open Source & Free to Use</p>
+        </div>
+    </div>
+</body>
+</html>
