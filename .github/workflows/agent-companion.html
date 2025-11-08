@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SADP智能伴学 - SADP Intelligent Learning Companion</title>
+    <!-- Coze SDK -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.4.0/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                fontSize: 22, // 节点文字大小
+                fontSizeSmall: 22, // 小文字大小
+                labelFontSize: 22 // 标签文字大小
+            },
+            flowchart: {
+                useMaxWidth: false, // 允许图表扩展到容器宽度
+                htmlLabels: true,
+                curve: 'linear',
+                nodeSpacing: 60, // 增加节点间距以适应更大的文字
+                rankSpacing: 80, // 增加层级间距以适应更大的文字
+                fontSize: 22
+            },
+            width: '100%',
+            height: '70%', // 进一步减小高度，避免图表过高
+            padding: 30
+        });
+    </script>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        /* Mermaid 图表容器样式 */
+        .mermaid {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            overflow: auto;
+            font-size: 22px !important;
+        }
+        
+        /* 确保 mermaid 图表填满容器 */
+        .mermaid svg {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        /* 强制设置节点和标签文字大小 */
+        .mermaid text {
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'SimHei';
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #f1f5f9;
+            background-attachment: fixed;
+        }
+        
+        .header {
+            background: rgba(30, 41, 59, 0.95);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 215, 0, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover { 
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .main-layout { 
+            display: flex; 
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .panel { 
+            padding: 25px; 
+            overflow-y: auto; 
+        }
+        
+        .left-panel {
+            width: 380px;
+            background: rgba(30, 41, 59, 0.9);
+            color: #f1f5f9;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .center-panel {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .right-panel {
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 41, 59, 0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .team-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .team-info h3 { 
+            margin-bottom: 12px; 
+            color: #ffd700; 
+            font-size: 1.2rem;
+        }
+        
+        .section-title { 
+            color: #ffd700; 
+            margin: 20px 0 15px; 
+            font-size: 1.4rem; 
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .section-title .chinese {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .section-title .english {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .chinese-item {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .english-item {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 12px;
+        }
+        
+        li:before {
+            content: "•";
+            color: #ffd700;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        table { 
+            width: 100%; 
+            margin: 15px 0; 
+            font-size: 0.95rem;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td { 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            padding: 12px; 
+            text-align: left; 
+        }
+        
+        th { 
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .chinese-th, .chinese-td {
+            font-size: 0.95rem;
+        }
+        
+        .english-th, .english-td {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+        
+        .workflow-svg {
+            min-width: 600px;
+            min-height: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .chat-header {
+            padding: 15px;
+            background: rgba(30, 41, 59, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffd700;
+        }
+        
+        .chat-header .chinese {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+        
+        .chat-header .english {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        .info-item {
+            margin: 12px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .info-item strong {
+            color: #ffd700;
+        }
+        
+        .info-item .chinese {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .info-item .english {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+        
+        .personalized-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .personalized-box h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .personalized-box .chinese {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .personalized-box .english {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .feature-card h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .feature-card .chinese {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .feature-card .english {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 300px;
+            }
+            
+            .right-panel {
+                width: 100%;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .left-panel {
+                max-height: 250px;
+            }
+            
+            .team-info {
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 1rem;
+            }
+            
+            .workflow-svg {
+                min-width: 90%;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .panel {
+                padding: 10px;
+            }
+            
+            .left-panel {
+                max-height: 200px;
+            }
+            
+            .team-info {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+            
+            ul, ol {
+                padding-left: 15px;
+            }
+            
+            li {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .workflow-svg {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2><i class="fas fa-user-graduate"></i> SADP智能伴学 - SADP Intelligent Learning Companion</h2>
+        <button class="back-btn" onclick="location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> 返回首页 - Back to Home
+        </button>
+    </div>
+
+    <div class="main-layout">
+        <!-- 左侧：文档 + 团队 -->
+        <div class="panel left-panel">
+            <div class="team-info">
+                <h3><i class="fas fa-book"></i> 课程信息 - Course Information</h3>
+                <p><strong>课程名称 - Course Name:</strong> 软件架构与设计模式 - Software Architecture and Design Patterns</p>
+                <h3><i class="fas fa-users"></i> 设计团队 - Design Team</h3>
+                <p>西安邮电大学 拓守恒教授教学团队（队员 何红副教授，刘海燕博士）</p>
+                <p>Xi'an University of Posts and Telecommunications Professor Shouheng Tuo's Teaching Team (Members: Associate Professor Hong He, Dr. Haiyan Liu)</p>
+            </div>
+            
+            <div class="info-item">
+                <div class="chinese"><strong>工作流名称:</strong> myIntelligentLearningAssistant</div>
+                <div class="english"><strong>Workflow Name:</strong> myIntelligentLearningAssistant</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="chinese"><strong>核心理念:</strong> "授人以鱼不如授人以渔"</div>
+                <div class="english"><strong>Core Concept:</strong> "Teach a man to fish" rather than "Give a man a fish"</div>
+            </div>
+            
+            <div class="personalized-box">
+                <div class="chinese"><h3>个性化学习伴侣</h3></div>
+                <div class="english"><h3>Personalized Learning Companion</h3></div>
+                <p>支持多模态输入的智能学习助手，通过苏格拉底提问法让学生深入思考，培养自主学习能力。</p>
+                <p>Intelligent learning assistant supporting multi-modal input, guiding students to think deeply through the Socratic method, and cultivating self-learning abilities.</p>
+            </div>
+            
+            <h2 class="section-title">
+                <div class="chinese"><i class="fas fa-bullseye"></i> 设计目标</div>
+                <div class="english">Design Goals</div>
+            </h2>
+            <ul>
+                <li>
+                    <div class="chinese-item">多模态输入支持（文本/文档/图片）</div>
+                    <div class="english-item">Multi-modal input support (text/documents/images)</div>
+                </li>
+                <li>
+                    <div class="chinese-item">RAG知识库领域专业知识（ID: 7566844865104330804）</div>
+                    <div class="english-item">RAG knowledge base for domain expertise (ID: 7566844865104330804)</div>
+                </li>
+                <li>
+                    <div class="chinese-item">双轨服务：直接回答 / 引导探索</div>
+                    <div class="english-item">Dual-track service: Direct answers / Guided exploration</div>
+                </li>
+                <li>
+                    <div class="chinese-item">苏格拉底法多轮引导</div>
+                    <div class="english-item">Socratic method multi-round guidance</div>
+                </li>
+            </ul>
+            
+            <h2 class="section-title">
+                <div class="chinese"><i class="fas fa-sitemap"></i> 关键组件</div>
+                <div class="english">Key Components</div>
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="chinese-th">组件</th>
+                        <th class="english-th">Component</th>
+                        <th class="chinese-th">功能</th>
+                        <th class="english-th">Function</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="chinese-td">链接读取插件</td>
+                        <td class="english-td">LinkReaderPlugin</td>
+                        <td class="chinese-td">解析PDF/Word/网页</td>
+                        <td class="english-td">Parse PDF/Word/Web pages</td>
+                    </tr>
+                    <tr>
+                        <td class="chinese-td">OCR插件</td>
+                        <td class="english-td">OCR Plugin</td>
+                        <td class="chinese-td">从图片中提取文本</td>
+                        <td class="english-td">Extract text from images</td>
+                    </tr>
+                    <tr>
+                        <td class="chinese-td">RAG检索</td>
+                        <td class="english-td">RAG Retrieval</td>
+                        <td class="chinese-td">课程知识库查询</td>
+                        <td class="english-td">Course knowledge base query</td>
+                    </tr>
+                    <tr>
+                        <td class="chinese-td">引导循环</td>
+                        <td class="english-td">Guidance Loop</td>
+                        <td class="chinese-td">生成问题 → 用户回答 → 评估掌握程度</td>
+                        <td class="english-td">Generate question → User response → Evaluate mastery</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>多模态支持</h4></div>
+                <div class="english"><h4>Multi-modal Support</h4></div>
+                <p>支持文本、文档、图片等多种输入方式，满足不同学习场景的需求。</p>
+                <p>Supports multiple input methods including text, documents, and images to meet the needs of different learning scenarios.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>智能引导</h4></div>
+                <div class="english"><h4>Intelligent Guidance</h4></div>
+                <p>通过苏格拉底提问法，让学生主动思考和探索，培养批判性思维。</p>
+                <p>Through the Socratic method, guide students to think and explore actively, cultivating critical thinking.</p>
+            </div>
+        </div>
+
+        <!-- 中间：Mermaid 工作流图 -->
+        <div class="panel center-panel" style="position: relative;">
+         <!--  
+             <img src="companion.png" alt="工作流图" class="workflow-svg" style="width: 30%; height: auto;opacity: 0.5;">
+          -->
+              
+            <div class="mermaid" style="width: 100%; height: 100%;">
+                flowchart TD
+                    start["Start<br/>开始"]:::process
+                    docUpload{"Doc Upload?<br/>文档?"}:::decision
+                    imageUpload{"Image Upload?<br/>图片?"}:::decision
+                    genQuestion["Gen Question<br/>生成问题"]:::process
+                    ragRetrieval["RAG Retrieval<br/>知识检索"]:::process
+                    results{"Results?<br/>有结果?"}:::decision
+                    integration["Integration<br/>结果整合"]:::process
+                    
+                    linkReader["LinkReader<br/>链接读取"]:::process
+                    ocrPlugin["OCR Plugin<br/>OCR插件"]:::process
+                    llmOutput["LLM Output<br/>大模型输出"]:::process
+                    
+                    start -->|"处理"| docUpload
+                    docUpload -->|"否"| imageUpload
+                    docUpload -->|"是"| linkReader
+                    linkReader -->|"提取"| ocrPlugin
+                    imageUpload -->|"是"| ocrPlugin
+                    imageUpload -->|"否"| genQuestion
+                    ocrPlugin -->|"完成"| genQuestion
+                    genQuestion -->|"生成"| ragRetrieval
+                    ragRetrieval -->|"检索"| results
+                    results -->|"是"| integration
+                    results -->|"否"| llmOutput
+                    llmOutput -->|"整合"| integration
+                    
+                    classDef process fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5,color:#1e3a8a,font-weight:bold;
+                    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5,color:#78350f,font-weight:bold;
+                    classDef startEnd fill:#dcfce7,stroke:#10b981,stroke-width:1.5,color:#065f46,font-weight:bold;
+                    
+                    linkStyle default stroke:#64748b,stroke-width:1.5,color:#475569,font-size:18px;
+            </div>
+        </div>
+
+        <!-- 右侧：嵌入智能体 -->
+        <div class="panel right-panel">
+            <div class="chat-header">
+                <div class="chinese"><i class="fas fa-comments"></i> 学习伴侣 · 实时聊天</div>
+                <div class="english">Learning Companion · Live Chat</div>
+            </div>
+            <div id="coze-container" style="flex:1;">请点击下方蓝色的coze图标，开始与学习伴侣进行实时聊天。</div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Coze 智能体（嵌入模式）
+        const client = new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7567703865425330217',
+                mode: 'embedded' // 设置为嵌入模式
+            },
+            componentProps: {
+                title: 'Learning Companion',
+                container: document.getElementById('coze-container'),
+                showTitle: false,
+                width: '100%',
+                height: '100%'
+            },
+            auth: {
+                type: 'token',
+                token: 'pat_mQPUVvdmkS2mFiOi4U6ixZMofBAxBFtU15qrGJjXJvXG0TeUfG4sNiUvhp7H8gF4',
+                onRefreshToken: () => 'pat_mQPUVvdmkS2mFiOi4U6ixZMofBAxBFtU15qrGJjXJvXG0TeUfG4sNiUvhp7H8gF4'
+            }
+        });
+
+        // 移除自动打开聊天窗口的代码，让智能体直接嵌入在页面中
+    </script>
+</body>
+</html>

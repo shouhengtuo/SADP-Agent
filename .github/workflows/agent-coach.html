@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SADP智能代码编程教练 - SADP Intelligent Coding Coach</title>
+    <!-- Coze SDK -->
+    <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mermaid JS -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.4.0/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#3b82f6',
+                primaryTextColor: '#ffffff',
+                primaryBorderColor: '#3b82f6',
+                lineColor: '#64748b',
+                secondaryColor: '#10b981',
+                tertiaryColor: '#f59e0b',
+                fontSize: 22, // 节点文字大小
+                fontSizeSmall: 22, // 小文字大小
+                labelFontSize: 22 // 标签文字大小
+            },
+            flowchart: {
+                useMaxWidth: false, // 允许图表扩展到容器宽度
+                htmlLabels: true,
+                curve: 'linear',
+                nodeSpacing: 60, // 增加节点间距以适应更大的文字
+                rankSpacing: 80, // 增加层级间距以适应更大的文字
+                fontSize: 22
+            },
+            width: '100%',
+            height: '70%', // 进一步减小高度，避免图表过高
+            padding: 30
+        });
+    </script>
+    <style>
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        
+        /* Mermaid 图表容器样式 */
+        .mermaid {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            max-height: 100%;
+            overflow: auto;
+            font-size: 22px !important;
+        }
+        
+        /* 确保 mermaid 图表填满容器 */
+        .mermaid svg {
+            width: 100% !important;
+            height: 100% !important;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        /* 强制设置节点和标签文字大小 */
+        .mermaid text {
+            font-size: 22px !important;
+            font-weight: bold !important;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Microsoft YaHei', 'SimHei';
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #f1f5f9;
+            background-attachment: fixed;
+        }
+        
+        .header {
+            background: rgba(30, 41, 59, 0.95);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+        }
+        
+        .header h2 {
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #ffd700, #ffffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .back-btn {
+            padding: 10px 20px;
+            background: rgba(255, 215, 0, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-btn:hover { 
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .main-layout { 
+            display: flex; 
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .panel { 
+            padding: 25px; 
+            overflow-y: auto; 
+        }
+        
+        .left-panel {
+            width: 380px;
+            background: rgba(30, 41, 59, 0.9);
+            color: #f1f5f9;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+        
+        .center-panel {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .right-panel {
+            width: 600px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(30, 41, 59, 0.95);
+            transition: all 0.3s ease;
+        }
+        
+        .team-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .team-info h3 { 
+            margin-bottom: 12px; 
+            color: #ffd700; 
+            font-size: 1.2rem;
+        }
+        
+        .section-title { 
+            color: #ffd700; 
+            margin: 20px 0 15px; 
+            font-size: 1.4rem; 
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+        }
+        
+        .section-title .chinese {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+        
+        .section-title .english {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        li {
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .chinese-item {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .english-item {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-bottom: 12px;
+        }
+        
+        li:before {
+            content: "•";
+            color: #ffd700;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+        
+        table { 
+            width: 100%; 
+            margin: 15px 0; 
+            font-size: 0.95rem;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th, td { 
+            border: 1px solid rgba(255, 255, 255, 0.2); 
+            padding: 12px; 
+            text-align: left; 
+        }
+        
+        th { 
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .chinese-th, .chinese-td {
+            font-size: 0.95rem;
+        }
+        
+        .english-th, .english-td {
+            font-size: 0.8rem;
+            color: #a0aec0;
+        }
+        
+        .workflow-svg {
+            min-width: 600px;
+            min-height: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        .chat-header {
+            padding: 15px;
+            background: rgba(30, 41, 59, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #ffd700;
+        }
+        
+        .chat-header .chinese {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+        
+        .chat-header .english {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            font-weight: 300;
+        }
+        
+        .info-item {
+            margin: 12px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .info-item strong {
+            color: #ffd700;
+        }
+        
+        .info-item .chinese {
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+        
+        .info-item .english {
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+        
+        .personalized-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .personalized-box h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .personalized-box .chinese {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+        
+        .personalized-box .english {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .feature-card h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+        
+        .feature-card .chinese {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        
+        .feature-card .english {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-bottom: 10px;
+        }
+        
+        @media (max-width: 1200px) {
+            .main-layout {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 300px;
+            }
+            
+            .right-panel {
+                width: 100%;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .header {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .left-panel {
+                max-height: 250px;
+            }
+            
+            .team-info {
+                padding: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.2rem;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 0.85rem;
+            }
+            
+            .workflow-svg {
+                min-width: 90%;
+                min-height: 400px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .back-btn {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .panel {
+                padding: 10px;
+            }
+            
+            .left-panel {
+                max-height: 200px;
+            }
+            
+            .team-info {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 1.1rem;
+            }
+            
+            ul, ol {
+                padding-left: 15px;
+            }
+            
+            li {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 6px;
+                font-size: 0.8rem;
+            }
+            
+            .workflow-svg {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2><i class="fas fa-laptop-code"></i> SADP智能代码编程教练 - SADP Intelligent Coding Coach</h2>
+        <button class="back-btn" onclick="location.href='index.html'">
+            <i class="fas fa-arrow-left"></i> 返回首页 - Back to Home
+        </button>
+    </div>
+
+    <div class="main-layout">
+        <!-- 左侧：文档 + 团队 -->
+        <div class="panel left-panel">
+            <div class="team-info">
+                <h3><i class="fas fa-book"></i> 课程信息 - Course Information</h3>
+                <p><strong>课程名称 - Course Name:</strong> 软件架构与设计模式 - Software Architecture and Design Patterns</p>
+                <h3><i class="fas fa-users"></i> 设计团队 - Design Team</h3>
+                <p>西安邮电大学 拓守恒教授教学团队（队员 何红副教授，刘海燕博士）</p>
+                <p>Xi'an University of Posts and Telecommunications Professor Shouheng Tuo's Teaching Team (Members: Associate Professor Hong He, Dr. Haiyan Liu)</p>
+            </div>
+            
+            <div class="info-item">
+                <div class="chinese"><strong>工作流名称:</strong> intelligent_code_Techer</div>
+                <div class="english"><strong>Workflow Name:</strong> intelligent_code_Techer</div>
+            </div>
+            
+            <div class="info-item">
+                <div class="chinese"><strong>核心理念:</strong> 从"代码纠错"升级为"设计思维培养"</div>
+                <div class="english"><strong>Core Concept:</strong> Upgrading from "code correction" to "design thinking cultivation"</div>
+            </div>
+            
+            <div class="personalized-box">
+                <div class="chinese"><h3>个性化编程教练</h3></div>
+                <div class="english"><h3>Personalized Coding Coach</h3></div>
+                <p>专注于软件设计模式识别与重构建议的AI编程教练，帮助学生提升代码质量和设计思维能力。</p>
+                <p>AI coding coach focused on software design pattern recognition and refactoring suggestions, helping students improve code quality and design thinking abilities.</p>
+            </div>
+            
+            <h2 class="section-title">
+                <div class="chinese"><i class="fas fa-bullseye"></i> 设计目标</div>
+                <div class="english">Design Goals</div>
+            </h2>
+            <ul>
+                <li>
+                    <div class="chinese-item">精准诊断设计反模式（God Class、紧耦合等）</div>
+                    <div class="english-item">Accurate diagnosis of design anti-patterns (God Class, tight coupling, etc.)</div>
+                </li>
+                <li>
+                    <div class="chinese-item">绑定4+1视图、SOLID原则</div>
+                    <div class="english-item">Binding 4+1 views, SOLID principles</div>
+                </li>
+                <li>
+                    <div class="chinese-item">情感化反馈（鼓励-建议-挑战-资源）</div>
+                    <div class="english-item">Emotional feedback (encouragement-suggestions-challenges-resources)</div>
+                </li>
+                <li>
+                    <div class="chinese-item">基于LTM实现个性化教学</div>
+                    <div class="english-item">Personalized teaching based on LTM</div>
+                </li>
+            </ul>
+            
+            <h2 class="section-title">
+                <div class="chinese"><i class="fas fa-star"></i> 输出结构</div>
+                <div class="english">Output Structure</div>
+            </h2>
+            <ol>
+                <li>
+                    <div class="chinese-item">🎯 模式灵魂（生活化比喻）</div>
+                    <div class="english-item">Pattern soul (life-like metaphor)</div>
+                </li>
+                <li>
+                    <div class="chinese-item">✨ 优点肯定</div>
+                    <div class="english-item">Advantages affirmation</div>
+                </li>
+                <li>
+                    <div class="chinese-item">🛠️ 改进建议</div>
+                    <div class="english-item">Improvement suggestions</div>
+                </li>
+                <li>
+                    <div class="chinese-item">🤔 挑战问题</div>
+                    <div class="english-item">Challenge questions</div>
+                </li>
+                <li>
+                    <div class="chinese-item">📚 资源推荐</div>
+                    <div class="english-item">Resource recommendations</div>
+                </li>
+                <li>
+                    <div class="chinese-item">💡 鼓励结尾</div>
+                    <div class="english-item">Encouraging conclusion</div>
+                </li>
+            </ol>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>设计模式识别</h4></div>
+                <div class="english"><h4>Design Pattern Recognition</h4></div>
+                <p>通过深度学习模型识别代码中的设计模式类型，提供准确的模式名称识别。</p>
+                <p>Identify design pattern types in code through deep learning models, providing accurate pattern name recognition.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="chinese"><h4>重构建议</h4></div>
+                <div class="english"><h4>Refactoring Suggestions</h4></div>
+                <p>基于识别结果提供具体的代码重构建议，帮助改善代码结构。</p>
+                <p>Provide specific code refactoring suggestions based on recognition results to help improve code structure.</p>
+            </div>
+        </div>
+
+        <!-- 中间：Mermaid 工作流图 -->
+        <div class="panel center-panel" style="position: relative;">
+            <div class="mermaid" style="width: 100%; height: 100%;">
+                flowchart TD
+                    start["Start: (task, code_files)<br/>开始: (任务, 代码文件)"]:::startEnd
+                    pattern["Design Pattern Recognition<br/>设计模式识别"]:::process
+                    merge["Merge Task & Code<br/>合并任务和代码"]:::process
+                    ltm["LTM Retrieval & Intent Recognition<br/>长期记忆检索与意图识别"]:::process
+                    
+                    subgraph "并行分析"[并行分析]
+                        patternType["Pattern Type<br/>模式类型识别"]:::process
+                        refactoring["Refactoring<br/>重构建议"]:::process
+                        diagnosis["Error Diagnosis<br/>错误诊断"]:::process
+                        comparative["Comparative<br/>对比分析"]:::process
+                    end
+                    
+                    aggregation["Code Analysis Aggregation<br/>代码分析结果聚合"]:::process
+                    endNode["End<br/>结束"]:::startEnd
+                    
+                    start -->|"初始化"| pattern
+                    pattern -->|"数据准备"| merge
+                    merge -->|"上下文理解"| ltm
+                    
+                    ltm -->|"设计模式类型识别"| patternType
+                    ltm -->|"代码重构建议"| refactoring
+                    ltm -->|"代码错误诊断"| diagnosis
+                    ltm -->|"对比分析"| comparative
+                    
+                    patternType -->|"整合"| aggregation
+                    refactoring -->|"整合"| aggregation
+                    diagnosis -->|"整合"| aggregation
+                    comparative -->|"整合"| aggregation
+                    
+                    aggregation -->|"输出"| endNode
+                    
+                    classDef startEnd fill:#dcfce7,stroke:#10b981,stroke-width:1.5,color:#065f46,font-weight:bold;
+                    classDef process fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5,color:#1e3a8a,font-weight:bold;
+                    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5,color:#78350f,font-weight:bold;
+                    classDef parallel fill:#f3e8ff,stroke:#8b5cf6,stroke-width:1.5,color:#4c1d95,font-weight:bold;
+                    
+                    linkStyle default stroke:#64748b,stroke-width:1.5,color:#475569,font-size:18px;
+            </div>
+        </div>
+
+        <!-- 右侧：嵌入智能体 -->
+        <div class="panel right-panel">
+            <div class="chat-header">
+                <div class="chinese"><i class="fas fa-comments"></i> 编程教练 · 实时聊天</div>
+                <div class="english">Coding Coach · Live Chat</div>
+            </div>
+            <div id="coze-container" style="flex:1;">请点击下方蓝色的coze图标，开始与编程教练进行实时聊天。</div>
+        </div>
+    </div>
+
+    <script>
+        // 初始化 Coze 智能体（嵌入模式）
+        const client = new CozeWebSDK.WebChatClient({
+            config: {
+                bot_id: '7569053106911477795',
+                mode: 'embedded' // 设置为嵌入模式
+            },
+            componentProps: {
+                title: 'Coding Coach',
+                container: document.getElementById('coze-container'),
+                showTitle: false,
+                width: '100%',
+                height: '100%',
+                enableFullScreenChat: true
+            },
+            auth: {
+                type: 'token',
+                token: 'pat_mQPUVvdmkS2mFiOi4U6ixZMofBAxBFtU15qrGJjXJvXG0TeUfG4sNiUvhp7H8gF4',
+                onRefreshToken: () => 'pat_mQPUVvdmkS2mFiOi4U6ixZMofBAxBFtU15qrGJjXJvXG0TeUfG4sNiUvhp7H8gF4'
+            }
+        });
+
+        // 移除自动打开聊天窗口的代码，让智能体直接嵌入在页面中
+    </script>
+</body>
+</html>
