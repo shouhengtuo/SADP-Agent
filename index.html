@@ -31,10 +31,33 @@
             border-radius: 20px;
             backdrop-filter: blur(10px);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
-            max-width: 800px;
+            max-width: 1200px;
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            gap: 30px;
+            justify-content: space-between;
+            margin-top: 50px;
+            flex-wrap: wrap;
+            align-items: flex-start;
+        }
+        
+        .left-column {
+            flex: 1;
+            min-width: 300px;
+            max-width: 600px;
+            text-align: left;
+        }
+        
+        .right-column {
+            flex: 1;
+            min-width: 300px;
+            max-width: 500px;
+            text-align: left;
         }
         
         .container:hover {
@@ -148,6 +171,108 @@
             font-weight: 600;
         }
         
+        /* 课程实验样式 */
+        .experiment-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .experiment-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .experiment-card:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .experiment-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .experiment-number {
+            background: linear-gradient(135deg, #ffd700, #ffb700);
+            color: #1e3c72;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .experiment-header h3 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.3rem;
+            flex: 1;
+        }
+        
+        .experiment-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .experiment-link {
+            display: inline-block;
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .experiment-link:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .experiment-link i {
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .experiment-subparts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .experiment-subparts a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+        
+        .experiment-subparts a:hover {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 30px 20px;
@@ -177,6 +302,31 @@
             
             .role h2 {
                 font-size: 1.3rem;
+            }
+            
+            .experiment-card {
+                padding: 20px 15px;
+            }
+            
+            .experiment-header h3 {
+                font-size: 1.2rem;
+            }
+            
+            .experiment-card p {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .content-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .left-column, .right-column {
+                width: 100%;
+                max-width: none;
+                margin-bottom: 30px;
             }
         }
         
@@ -222,6 +372,29 @@
             .footer {
                 font-size: 0.8rem;
             }
+            
+            .experiment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .experiment-number {
+                margin-right: 0;
+            }
+            
+            .experiment-header h3 {
+                font-size: 1.1rem;
+            }
+            
+            .experiment-subparts {
+                flex-direction: column;
+            }
+            
+            .experiment-subparts a {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -255,34 +428,113 @@
             </div>
         </div>
         
-        <!-- 系统功能介绍 -->
-        <div id="features" style="margin-top: 50px; text-align: left; max-width: 700px; margin-left: auto; margin-right: auto;">
-            <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">🔹 系统功能介绍</h2>
-            
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                <h3 style="color: #ffffff; margin-bottom: 10px;">1. SADP智能伴学 (Learning Companion)</h3>
-                <p style="color: #cbd5e1; margin-bottom: 5px;">• 学习资料解析与问答</p>
-                <p style="color: #cbd5e1; margin-bottom: 5px;">• 文档、图片内容理解</p>
-                <p style="color: #cbd5e1;">• 智能问题生成与解答</p>
+        <!-- 双栏布局：左侧系统功能，右侧课程实验 -->
+        <div class="content-wrapper">
+            <!-- 系统功能介绍 (左侧) -->
+            <div id="features" class="left-column">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">🔹 系统功能介绍</h2>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="color: #ffffff; margin-bottom: 10px;">1. SADP智能伴学 (Learning Companion)</h3>
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">• 学习资料解析与问答</p>
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">• 文档、图片内容理解</p>
+                    <p style="color: #cbd5e1;">• 智能问题生成与解答</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                    <h3 style="color: #ffffff; margin-bottom: 10px;">2. SADP智能代码编程教练 (Coding Coach)</h3>
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">• 代码分析与优化建议</p>
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">• 设计模式识别与应用</p>
+                    <p style="color: #cbd5e1;">• 编程问题诊断与解决方案</p>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px;">
+                    <h3 style="color: #ffffff; margin-bottom: 10px;">3. SADP教学伴侣 (Teaching Assistant)</h3>
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">• 教学计划生成</p>
+                    <p style="color: #cbd5e1; margin-bottom: 5px;">• 学习目标与策略制定</p>
+                    <p style="color: #cbd5e1;">• 教学内容与评估方法推荐</p>
+                </div>
             </div>
             
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                <h3 style="color: #ffffff; margin-bottom: 10px;">2. SADP智能代码编程教练 (Coding Coach)</h3>
-                <p style="color: #cbd5e1; margin-bottom: 5px;">• 代码分析与优化建议</p>
-                <p style="color: #cbd5e1; margin-bottom: 5px;">• 设计模式识别与应用</p>
-                <p style="color: #cbd5e1;">• 编程问题诊断与解决方案</p>
-            </div>
-            
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px;">
-                <h3 style="color: #ffffff; margin-bottom: 10px;">3. SADP教学伴侣 (Teaching Assistant)</h3>
-                <p style="color: #cbd5e1; margin-bottom: 5px;">• 教学计划生成</p>
-                <p style="color: #cbd5e1; margin-bottom: 5px;">• 学习目标与策略制定</p>
-                <p style="color: #cbd5e1;">• 教学内容与评估方法推荐</p>
+            <!-- 课程实验 (右侧) -->
+            <div id="experiments" class="right-column">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">🔹 课程实验项目</h2>
+                
+                <div class="experiment-container">
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验1</span>
+                            <h3>UML实验 宠物管理系统</h3>
+                        </div>
+                        <p>本实验基于华为基座技术，通过UML建模工具实现宠物管理系统的需求分析与设计。学生将学习使用统一建模语言进行系统分析，掌握类图、用例图、序列图等建模方法，培养面向对象的系统设计思维。</p>
+                        <a href="2025软件体系结构与设计模式课程实验/实验1-UML实验 宠物管理系统.htm" target="_blank" class="experiment-link">查看详情 <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                    
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验2</span>
+                            <h3>学生成绩管理系统</h3>
+                        </div>
+                        <p>本实验基于华为基座技术栈，设计和实现学生成绩管理系统。学生将学习分层架构设计原则，使用华为云数据库服务存储成绩数据，实现用户权限管理、成绩录入、统计分析等核心功能。</p>
+                        <a href="2025软件体系结构与设计模式课程实验/实验2-学生成绩管理系统.htm" target="_blank" class="experiment-link">查看详情 <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                    
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验3</span>
+                            <h3>基于微服务架构的在线学习管理系统UML建模与分析</h3>
+                        </div>
+                        <p>本实验采用华为微服务框架和云原生技术，指导学生构建基于微服务架构的在线学习管理系统。实验重点关注服务拆分、API网关设计、服务注册与发现等微服务核心概念。</p>
+                        <a href="2025软件体系结构与设计模式课程实验/实验3- 基于微服务架构的在线学习管理系统UML建模与分析2 .htm" target="_blank" class="experiment-link">查看详情 <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                    
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验4</span>
+                            <h3>基于4+1视图的在线学习管理系统UML建模与分析</h3>
+                        </div>
+                        <p>本实验基于华为云平台，采用4+1视图模型对在线学习管理系统进行全面建模与分析。学生将学习华为软件开发云的DevCloud平台使用，通过多维度视图分析系统架构。</p>
+                        <div class="experiment-subparts">
+                            <a href="2025软件体系结构与设计模式课程实验/实验4-基于4+1视图的在线学习管理系统UML建模与分析Part 1场景视图.html" target="_blank">Part 1: 场景视图</a>
+                            <a href="2025软件体系结构与设计模式课程实验/实验4-基于4+1视图的在线学习管理系统UML建模与分析Part 2逻辑视图.html" target="_blank">Part 2: 逻辑视图</a>
+                            <a href="2025软件体系结构与设计模式课程实验/实验4-基于4+1视图的在线学习管理系统UML建模与分析Part 3开发视图.html" target="_blank">Part 3: 开发视图</a>
+                            <a href="2025软件体系结构与设计模式课程实验/实验4-基于4+1视图的在线学习管理系统UML建模与分析Part 4进程视图.html" target="_blank">Part 4: 进程视图</a>
+                            <a href="2025软件体系结构与设计模式课程实验/实验4-基于4+1视图的在线学习管理系统UML建模与分析Part5物理视图与总结.html" target="_blank">Part 5: 物理视图与总结</a>
+                        </div>
+                    </div>
+                    
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验5</span>
+                            <h3>工厂设计模式实验</h3>
+                        </div>
+                        <p>本实验基于华为云开发环境，深入学习工厂设计模式的实现与应用。学生将通过华为CodeArts IDE实现简单工厂、工厂方法和抽象工厂三种工厂模式变体，应用于实际业务场景中。</p>
+                        <a href="2025软件体系结构与设计模式课程实验/实验5-工厂设计模式实验指导书.pdf" target="_blank" class="experiment-link">查看详情 <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                    
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验6</span>
+                            <h3>基于华为基座技术的Java设计模式数据适配器实验</h3>
+                        </div>
+                        <p>本实验基于华为基座技术栈，实现Java设计模式中的适配器模式。学生将学习如何使用华为云原生SDK和中间件，实现不同系统间的数据适配与转换。</p>
+                        <a href="2025软件体系结构与设计模式课程实验/实验6-基于华为基座技术的Java设计模式数据适配器实验指导书.htm" target="_blank" class="experiment-link">查看详情 <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                    
+                    <div class="experiment-card">
+                        <div class="experiment-header">
+                            <span class="experiment-number">实验7</span>
+                            <h3>基于华为生态的智能设备服务中间件系统设计</h3>
+                        </div>
+                        <p>本实验基于华为IoT生态和鸿蒙操作系统，设计智能设备服务中间件系统。学生将学习华为IoT平台API和设备接入服务，实现设备管理、数据采集、远程控制等核心功能。</p>
+                        <a href="2025软件体系结构与设计模式课程实验/实验7-基于华为生态的智能设备服务中间件系统设计.html" target="_blank" class="experiment-link">查看详情 <i class="fas fa-external-link-alt"></i></a>
+                    </div>
+                </div>
             </div>
         </div>
         
         <!-- 部署说明 -->
-        <div id="deploy" style="margin-top: 50px; text-align: left; max-width: 700px; margin-left: auto; margin-right: auto;">
+        <div id="deploy" style="margin-top: 50px; text-align: left; max-width: 1200px; margin-left: auto; margin-right: auto;">
             <h2 style="text-align: center; margin-bottom: 30px; color: #ffd700;">🔹 部署与使用指南</h2>
             
             <div style="background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 10px;">
