@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>基于华为生态的智能设备服务中间件系统设计 — 设计模式综合实验</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", "Microsoft YaHei", sans-serif;
+      line-height: 1.6;
+      margin: 0 auto;
+      padding: 2rem;
+      max-width: 960px;
+      background-color: #fdfdfd;
+      color: #333;
+    }
+    h1, h2, h3 {
+      color: #1a5fb4;
+    }
+    h1 {
+      text-align: center;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 1rem;
+    }
+    h2 {
+      margin-top: 2rem;
+      border-left: 4px solid #1a5fb4;
+      padding-left: 0.8rem;
+    }
+    pre {
+      background-color: #f4f4f4;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-family: Consolas, monospace;
+      font-size: 0.95em;
+    }
+    .pattern-section {
+      margin-bottom: 3rem;
+      padding: 1.5rem;
+      border: 1px solid #eaeaea;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+    .requirements {
+      background-color: #f9f7e8;
+      padding: 1.2rem;
+      border-left: 4px solid #d4a017;
+      margin: 2rem 0;
+    }
+    .note {
+      font-style: italic;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+<h1>基于华为生态的智能设备服务中间件系统设计<br><small>—— 设计模式综合实验</small></h1>
+
+<p>本实验要求基于华为云IoT平台,CodeArts或HarmonyOS设备协同场景，设计并实现一个支持多种设计模式的中间件系统。以下为详细设计思路与类图规范，需据此完成代码实现与实验报告撰写。</p>
+
+<div class="requirements">
+  <h2>📌 实验总要求</h2>
+  <ul>
+    <li>理解每个设计模式在本场景中的<strong>动机</strong>与<strong>职责划分</strong>；</li>
+    <li>根据下方提供的 PlantUML 类图，<strong>绘制正式类图</strong>（可使用 PlantUML 在线渲染器）；</li>
+    <li>基于类图与设计说明，<strong>编写核心类骨架代码</strong>（不提供完整实现）；</li>
+    <li>撰写符合规范的实验报告（格式要求见文末）。</li>
+  </ul>
+  <p class="note">❗ 严禁直接复制完整代码。本指导仅提供架构设计与接口契约。</p>
+</div>
+
+<!-- ============= 单例模式 ============= -->
+<div class="pattern-section">
+  <h2>1. 单例模式（Singleton）</h2>
+  <h3>应用场景</h3>
+  <p>系统全局配置管理器（<code>SystemConfig</code>）与设备注册中心（<code>DeviceRegistry</code>）在整个应用生命周期中仅需一个实例，且需线程安全（适配华为云多线程容器环境）。</p>
+  
+  <h3>设计要点</h3>
+  <ul>
+    <li>使用双重检查锁（DCL）或静态内部类实现懒加载；</li>
+    <li>禁止外部通过构造函数创建实例；</li>
+    <li>考虑序列化/反序列化安全（可选高阶要求）。</li>
+  </ul>
+
+  <h3>PlantUML 类图</h3>
+  <pre>
+@startuml
+class SystemConfig {
+  - static instance: SystemConfig
+  - SystemConfig()
+  + static getInstance(): SystemConfig
+}
+
+note right of SystemConfig
+  线程安全单例
+  懒加载或饿汉式
+end note
+@enduml
+  </pre>
+</div>
+
+<!-- ============= 适配器模式 ============= -->
+<div class="pattern-section">
+  <h2>2. 适配器模式（Adapter）</h2>
+  <h3>应用场景</h3>
+  <p>系统需接入不同厂商设备（如厂商A提供 <code>start()</code>/<code>readData()</code>，厂商B提供 <code>powerOn()</code>/<code>getData()</code>），但对外暴露统一接口 <code>IDevice</code>（<code>connect()</code>, <code>fetchData()</code>）。</p>
+
+  <h3>设计要点</h3>
+  <ul>
+    <li>定义统一设备接口 <code>IDevice</code>；</li>
+    <li>为每类异构设备实现一个适配器类；</li>
+    <li>适配器持有目标设备实例并转换调用。</li>
+  </ul>
+
+  <h3>PlantUML 类图</h3>
+  <pre>
+@startuml
+interface IDevice {
+  + connect()
+  + fetchData()
+}
+
+class VendorADevice {
+  + start()
+  + readData()
+}
+
+class VendorBDevice {
+  + powerOn()
+  + getData()
+}
+
+class AdapterA {
+  - vendor: VendorADevice
+  + connect()
+  + fetchData()
+}
+
+class AdapterB {
+  - vendor: VendorBDevice
+  + connect()
+  + fetchData()
+}
+
+IDevice <|-- AdapterA
+IDevice <|-- AdapterB
+AdapterA --> VendorADevice : uses
+AdapterB --> VendorBDevice : uses
+@enduml
+  </pre>
+</div>
+
+<!-- ============= 观察者模式 ============= -->
+<div class="pattern-section">
+  <h2>3. 观察者模式（Observer）</h2>
+  <h3>应用场景</h3>
+  <p>当设备状态变化（如门锁解锁、传感器超阈值），需通知日志模块、告警服务、UI界面等多个观察者。</p>
+
+  <h3>设计要点</h3>
+  <ul>
+    <li>定义 <code>DeviceSubject</code>（被观察者）与 <code>IObserver</code> 接口；</li>
+    <li>支持动态注册/注销观察者；</li>
+    <li>通知时传递事件上下文（如设备ID、状态值）。</li>
+  </ul>
+
+  <h3>PlantUML 类图</h3>
+  <pre>
+@startuml
+interface IObserver {
+  + update(event: DeviceEvent)
+}
+
+class DeviceSubject {
+  - observers: List<IObserver>
+  + attach(o: IObserver)
+  + detach(o: IObserver)
+  + notify(event: DeviceEvent)
+}
+
+class UILogger
+class AlarmService
+class DataRecorder
+
+DeviceSubject --> IObserver : notifies
+IObserver <|-- UILogger
+IObserver <|-- AlarmService
+IObserver <|-- DataRecorder
+@enduml
+  </pre>
+</div>
+
+<!-- ============= 装饰模式 ============= -->
+<div class="pattern-section">
+  <h2>4. 装饰模式（Decorator）</h2>
+  <h3>应用场景</h3>
+  <p>设备数据发送功能需动态叠加加密、压缩、添加时间戳等增强行为，组合方式在运行时确定。</p>
+
+  <h3>设计要点</h3>
+  <ul>
+    <li>定义 <code>IDataSender</code> 接口；</li>
+    <li>提供基础实现 <code>BasicSender</code>；</li>
+    <li>所有装饰器继承 <code>DataSenderDecorator</code> 并持有 <code>IDataSender</code> 引用。</li>
+  </ul>
+
+  <h3>PlantUML 类图</h3>
+  <pre>
+@startuml
+interface IDataSender {
+  + send(data: String)
+}
+
+class BasicSender {
+  + send(data: String)
+}
+
+abstract class DataSenderDecorator {
+  - sender: IDataSender
+  + send(data: String)
+}
+
+class EncryptionDecorator {
+  + send(data: String)
+}
+
+class CompressionDecorator {
+  + send(data: String)
+}
+
+class TimestampDecorator {
+  + send(data: String)
+}
+
+IDataSender <|-- BasicSender
+IDataSender <|-- DataSenderDecorator
+DataSenderDecorator <|-- EncryptionDecorator
+DataSenderDecorator <|-- CompressionDecorator
+DataSenderDecorator <|-- TimestampDecorator
+DataSenderDecorator --> IDataSender : wraps
+@enduml
+  </pre>
+</div>
+
+<!-- ============= 代理模式 ============= -->
+<div class="pattern-section">
+  <h2>5. 代理模式（Proxy）</h2>
+  <h3>应用场景</h3>
+  <p>调用华为云AI服务（如图像识别）前，需进行权限校验、访问频率控制、日志记录等，避免直接暴露真实服务。</p>
+
+  <h3>设计要点</h3>
+  <ul>
+    <li>代理类与真实服务实现相同接口；</li>
+    <li>代理在调用前后插入控制逻辑；</li>
+    <li>可结合单例管理连接池（高阶）。</li>
+  </ul>
+
+  <h3>PlantUML 类图</h3>
+  <pre>
+@startuml
+interface IHuaweiAIService {
+  + analyze(image: byte[]): AnalysisResult
+}
+
+class HuaweiAIService {
+  + analyze(image: byte[]): AnalysisResult
+}
+
+class HuaweiAIServiceProxy {
+  - realService: HuaweiAIService
+  + analyze(image: byte[]): AnalysisResult
+}
+
+IHuaweiAIService <|-- HuaweiAIService
+IHuaweiAIService <|-- HuaweiAIServiceProxy
+HuaweiAIServiceProxy --> HuaweiAIService : delegates to
+@enduml
+  </pre>
+</div>
+
+<!-- ============= 桥接模式 ============= -->
+<div class="pattern-section">
+  <h2>6. 桥接模式（Bridge）</h2>
+  <h3>应用场景</h3>
+  <p>设备类型（灯、传感器、门锁）与通信平台（Wi-Fi、蓝牙、Zigbee）两个维度独立变化，避免类爆炸。</p>
+
+  <h3>设计要点</h3>
+  <ul>
+    <li>将抽象部分（设备类型）与实现部分（平台）分离；</li>
+    <li>通过组合而非继承连接两个维度；</li>
+    <li>支持运行时动态切换平台。</li>
+  </ul>
+
+  <h3>PlantUML 类图</h3>
+  <pre>
+@startuml
+abstract class AbstractDevice {
+  - platform: DevicePlatform
+  + operate()
+}
+
+interface DevicePlatform {
+  + sendData(data: String)
+}
+
+class LightDevice
+class SensorDevice
+class LockDevice
+
+class WiFiPlatform
+class BLEPlatform
+class ZigbeePlatform
+
+AbstractDevice <|-- LightDevice
+AbstractDevice <|-- SensorDevice
+AbstractDevice <|-- LockDevice
+
+DevicePlatform <|-- WiFiPlatform
+DevicePlatform <|-- BLEPlatform
+DevicePlatform <|-- ZigbeePlatform
+
+AbstractDevice --> DevicePlatform : uses
+@enduml
+  </pre>
+</div>
+
+<!-- ============= 报告规范 ============= -->
+<div class="requirements">
+  <h2>📘 实验报告撰写规范）</h2>
+  <h3>1. 内容结构</h3>
+  <ol>
+    <li><strong>封面</strong>：实验名称、姓名、学号、专业、课程、日期；</li>
+    <li><strong>摘要</strong>（150–200字）：概述目标、方法、成果；</li>
+    <li><strong>1. 引言</strong>：华为生态背景、系统需求、设计挑战；</li>
+    <li><strong>2. 设计模式分析</strong>：对6种模式分别说明应用动机、类职责、协作关系；</li>
+    <li><strong>3. UML类图</strong>：使用 PlantUML 渲染的清晰类图（嵌入报告）；</li>
+    <li><strong>4. 核心接口/类定义</strong>：仅展示接口与关键方法签名（非完整代码）；</li>
+    <li><strong>5. 总结与反思</strong>：模式选择合理性、可扩展性、与华为基座集成思考；</li>
+    <li><strong>参考文献</strong>：GoF 书籍、华为官方文档等。</li>
+  </ol>
+
+  <h3>2. 排版与格式</h3>
+  <ul>
+    <li>字体：正文宋体小四，标题黑体；</li>
+    <li>行距：1.5倍；</li>
+    <li>图表：编号+标题（如“图3 观察者模式类图”），居中；</li>
+    <li>代码：等宽字体（Consolas），灰色底纹；</li>
+    <li>文件命名：<code>学号_姓名_设计模式实验报告.pdf</code>。</li>
+  </ul>
+
+  <h3>3. 提交要求</h3>
+  <ul>
+    <li>PDF 格式实验报告（含所有类图与说明）；</li>
+    <li>源代码压缩包（含完整项目结构与注释）；</li>
+    <li>截止日期：按课程安排。</li>
+  </ul>
+</div>
+
+</body>
+</html>

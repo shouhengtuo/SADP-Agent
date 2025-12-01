@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 实验：基于4+1视图的在线学习管理系统UML建模与分析（Part 2）</title>
+    <style>
+        :root {
+            --primary: #4a6cf7;
+            --secondary: #6c757d;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --info: #1890ff;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), #3a57e8);
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+        .university-header {
+            background-color: #003d7a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+        h1 {
+            font-size: 2.4rem;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: var(--dark);
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        h4 {
+            color: var(--dark);
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin: 15px 0 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .badge-primary { background-color: var(--primary); color: white; }
+        .badge-success { background-color: var(--success); color: white; }
+        .badge-warning { background-color: var(--warning); color: white; }
+        .badge-danger { background-color: var(--danger); color: white; }
+        .badge-info { background-color: var(--info); color: white; }
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+        .plantuml-code {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 25px 0;
+            line-height: 1.6;
+            white-space: pre;
+            font-size: 14px;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: #3a57e8;
+        }
+        .step {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .step-number {
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .tip-box {
+            background-color: #e6f7ff;
+            border-left: 6px solid var(--info);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .warning-box {
+            background-color: #fff7e6;
+            border-left: 6px solid var(--warning);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .success-box {
+            background-color: #f6ffed;
+            border-left: 6px solid var(--success);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .diagram-explanation {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .author-info {
+            background: linear-gradient(135deg, #f0f5ff, #e6f2ff);
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--secondary);
+            border-top: 2px solid #eee;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            header { padding: 25px; }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="university-header">
+        <h2>西安邮电大学 · 软件工程实验指导书（4+1视图改进版）</h2>
+        <p>报告设计者和主讲教师：拓守恒 </p>
+    </div>
+    <header>
+        <h1>🎓 基于4+1视图的在线学习管理系统UML建模与分析（Part 2: 逻辑视图）</h1>
+        <div class="subtitle">
+            <span class="badge badge-primary">4+1视图架构</span>
+            <span class="badge badge-info">UML建模综合应用</span>
+            <span class="badge badge-success">系统设计能力培养</span>
+            <span class="badge badge-warning">👨‍🏫 拓守恒     实验指导书</span>
+        </div>
+    </header>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 教授</p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <!-- 一、逻辑视图概述 -->
+    <div class="card">
+        <h2>🧩 一、逻辑视图概述</h2>
+        <h3>🎯 目标与作用</h3>
+        <p><strong>逻辑视图</strong>（Logical View）关注系统的<strong>功能需求</strong>，即系统为用户提供哪些服务。它描述了系统内部的<strong>静态结构</strong>（如类、对象、包）和<strong>动态行为</strong>（如状态变迁、活动流程），是连接用户需求（场景视图）与代码实现（开发视图）的桥梁。</p>
+        <p>对于 OLMS 系统，逻辑视图将重点展示：</p>
+        <ul>
+            <li>核心业务对象（如课程、用户、作业）的结构和关系</li>
+            <li>对象在其生命周期中的状态变化（如课程从“未开始”到“进行中”）</li>
+            <li>关键业务流程的执行步骤（如创建课程、提交作业）</li>
+        </ul>
+
+        <h3>🔧 逻辑视图 vs 场景视图</h3>
+        <div class="tip-box">
+            <strong>场景视图</strong>回答“系统做什么？”（What）<br>
+            <strong>逻辑视图</strong>回答“系统内部如何组织以实现这些功能？”（How）<br><br>
+            例如，“学生提交作业”是一个用例（场景视图），而逻辑视图则定义了 <code>Student</code>、<code>Assignment</code>、<code>Submission</code> 类及其交互方式。
+        </div>
+    </div>
+
+    <!-- 二、核心业务对象识别 -->
+    <div class="card">
+        <h2>🔍 二、核心业务对象识别</h2>
+        <p>构建逻辑视图的第一步是识别系统中的核心业务对象。这些对象通常来源于用例图中的名词。</p>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>从用例中提取名词：</strong>
+            <ul>
+                <li>参与者：学生、教师、助教、管理员</li>
+                <li>业务实体：课程、直播、录播、作业、考试、资源、社区帖子、学习报告</li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>合并与抽象：</strong>
+            <ul>
+                <li>“直播”和“录播”可抽象为 <code>Resource</code>（资源）</li>
+                <li>“作业”和“考试”可视为 <code>Assessment</code>（评估）的子类</li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>确定核心对象列表：</strong>
+            <ul>
+                <li><code>User</code>（用户）</li>
+                <li><code>Course</code>（课程）</li>
+                <li><code>Resource</code>（资源）</li>
+                <li><code>Assignment</code>（作业）</li>
+                <li><code>Submission</code>（提交）</li>
+                <li><code>Enrollment</code>（选课记录）</li>
+                <li><code>ForumPost</code>（社区帖子）</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 三、类图建模 -->
+    <div class="card">
+        <h2>🧱 三、类图建模：静态结构设计</h2>
+        <h3>🎯 设计目标</h3>
+        <p>类图是逻辑视图的核心，用于描述系统中类的结构、属性、方法以及类之间的关系。</p>
+
+        <h3>🔧 设计步骤</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>定义类的属性：</strong> 描述对象的数据特征。例如，<code>Course</code> 有 <code>courseId</code>、<code>title</code>、<code>startDate</code> 等。
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>定义类的方法：</strong> 描述对象的行为。例如，<code>User</code> 有 <code>login()</code>、<code>register()</code>。
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>确定类间关系：</strong>
+            <ul>
+                <li><strong>关联（Association）：</strong> 两个类之间存在使用关系（如学生选课）</li>
+                <li><strong>聚合（Aggregation）：</strong> “整体-部分”关系，部分可独立存在（如课程包含资源）</li>
+                <li><strong>组合（Composition）：</strong> “整体-部分”关系，部分不能独立存在（如课程包含选课记录）</li>
+                <li><strong>继承（Inheritance）：</strong> 子类继承父类的属性和方法（如 <code>LiveResource</code> 继承 <code>Resource</code>）</li>
+                <li><strong>实现（Realization）：</strong> 类实现接口（如 <code>NotificationService</code> 实现 <code>INotifier</code>）</li>
+            </ul>
+        </div>
+
+        <h3>📊 OLMS 核心类图（课程服务）</h3>
+        <div class="plantuml-code" id="logical-class">@startuml
+' 逻辑视图 - 核心类图 (课程服务)
+title 逻辑视图 - 课程服务核心类图
+
+class User {
+  - userId: String
+  - name: String
+  - email: String
+  - role: String (Student/Teacher/TA/Admin)
+  + login(): Boolean
+  + register(): Boolean
+}
+
+class Course {
+  - courseId: String
+  - title: String
+  - description: String
+  - startDate: Date
+  - endDate: Date
+  - status: String (未开始/进行中/已结束/归档/取消)
+  - teacherId: String
+  + createCourse(): void
+  + updateCourse(): void
+  + deleteCourse(): void
+  + enrollStudent(studentId: String): void
+  + dropStudent(studentId: String): void
+  + getCourseInfo(): CourseInfo
+}
+
+class Resource {
+  - resourceId: String
+  - title: String
+  - type: String (Video/Document/PDF)
+  - url: String
+  - uploadDate: Date
+  - courseId: String
+  + uploadResource(): void
+  + downloadResource(): void
+}
+
+class Enrollment {
+  - enrollmentId: String
+  - studentId: String
+  - courseId: String
+  - enrollmentDate: Date
+  - completionStatus: String (未开始/进行中/已完成)
+  - progress: Double
+  + updateProgress(): void
+  + getProgress(): Double
+}
+
+class Assignment {
+  - assignmentId: String
+  - title: String
+  - description: String
+  - courseId: String
+  - dueDate: Date
+  + createAssignment(): void
+  + updateAssignment(): void
+  + submitAssignment(submission: Submission): void
+}
+
+class Submission {
+  - submissionId: String
+  - assignmentId: String
+  - studentId: String
+  - content: String (File Path/Text)
+  - submitDate: Date
+  - grade: Double
+  - feedback: String
+  + gradeSubmission(grade: Double, feedback: String): void
+}
+
+' 定义关系
+User ||--o{ Course : "teaches (教师)"
+User ||--o{ Enrollment : "enrolls (学生)"
+Course ||--o{ Resource : "contains"
+Course ||--o{ Assignment : "has"
+Enrollment ||--o{ Submission : "has"
+
+note right of Course
+  课程状态包括：
+  - 未开始
+  - 进行中
+  - 已结束
+  - 归档
+  - 取消
+end note
+
+note right of User
+  用户角色包括：
+  - Student
+  - Teacher
+  - TA (助教)
+  - Admin (管理员)
+end note
+
+@enduml</div>
+        <div class="diagram-explanation">
+            <strong>图2-1：OLMS 逻辑视图 - 课程服务核心类图</strong><br>
+            本图展示了 OLMS 系统中课程服务模块的核心数据结构和业务逻辑。<code>User</code> 类代表系统中的所有用户，通过 <code>role</code> 属性区分身份。<code>Course</code> 类是核心，包含了课程的基本信息和状态。教师与课程之间存在 "teaches" 关系，表示一个教师可以教授多门课程。课程与资源是 "contains" 关系，表明课程可以包含多个学习资源。学生通过 <code>Enrollment</code> 类与课程建立多对多关系，记录选课和学习进度。课程可以布置 <code>Assignment</code>（作业），学生提交 <code>Submission</code>（提交物）来完成作业。这种设计清晰地反映了系统的核心业务概念及其关系。
+        </div>
+    </div>
+
+    <!-- 四、状态图建模 -->
+    <div class="card">
+        <h2>🔄 四、状态图建模：对象生命周期</h2>
+        <h3>🎯 设计目标</h3>
+        <p>状态图用于描述一个对象在其生命周期内所经历的状态序列，以及因响应事件而发生的状态转移和动作。</p>
+
+        <h3>📊 课程对象状态图</h3>
+        <div class="plantuml-code" id="logical-state">@startuml
+title 逻辑视图 - 课程状态机
+
+[*] --> 未开始
+未开始 --> 进行中 : 开始日期到达 / 通知学生
+未开始 --> 进行中 : 教师手动启动 / 通知学生
+未开始 --> 取消 : 教师取消 / 通知学生
+未开始 --> 取消 : 选课人数不足 / 通知学生
+进行中 --> 已结束 : 结束日期到达 / 通知学生
+进行中 --> 已结束 : 教师手动结束 / 通知学生
+进行中 --> 暂停 : 教师暂停 / 通知学生
+进行中 --> 暂停 : 系统维护 / 通知学生
+暂停 --> 进行中 : 教师恢复 / 通知学生
+暂停 --> 已结束 : 教师手动结束 / 通知学生
+已结束 --> 归档 : 管理员操作 / 系统清理
+
+note right of 未开始
+  课程创建后默认状态
+  可设置开始和结束日期
+  学生可查看信息但不能参与
+end note
+note right of 进行中
+  学生可参与学习
+  教师可管理课程内容
+end note
+note right of 已结束
+  学生可查看资料
+  但不能提交作业或考试
+end note
+note right of 归档
+  课程数据保留
+  不再显示在活跃列表
+end note
+@enduml</div>
+        <div class="diagram-explanation">
+            <strong>图2-2：OLMS 逻辑视图 - 课程状态图</strong><br>
+            本状态图详细描述了 <code>Course</code> 对象的生命周期。它从“未开始”状态开始，根据不同的触发事件（如时间到达、用户操作）转移到下一个状态。每个状态转换都附带了相应的动作（如发送通知）。这有助于明确业务规则，例如课程如何从“未开始”变为“进行中”，或者在什么情况下会被“取消”或“暂停”。这对于理解系统的业务逻辑至关重要。
+        </div>
+
+        <h3>📊 作业对象状态图</h3>
+        <div class="plantuml-code" id="assignment-state">@startuml
+title 逻辑视图 - 作业状态机
+
+[*] --> 未发布
+未发布 --> 已发布 : 教师发布 / 通知学生
+已发布 --> 已截止 : 截止日期到达
+已发布 --> 已截止 : 教师手动截止
+已截止 --> 已批改 : 助教/教师批改完成
+已批改 --> 已归档 : 课程结束 / 系统归档
+
+note right of 未发布
+  作业创建后默认状态
+  学生不可见
+end note
+note right of 已发布
+  学生可提交作业
+  教师可修改截止时间
+end note
+note right of 已截止
+  学生不可再提交
+  教师/助教开始批改
+end note
+note right of 已批改
+  学生可查看成绩和反馈
+end note
+@enduml</div>
+        <div class="diagram-explanation">
+            <strong>图2-3：OLMS 逻辑视图 - 作业状态图</strong><br>
+            本图描述了 <code>Assignment</code> 对象的状态变迁。作业从“未发布”开始，教师发布后学生可提交；截止后进入批改阶段；批改完成后学生可查看成绩；最终随课程归档。状态图确保了作业流程的规范性和可追溯性。
+        </div>
+    </div>
+
+    <!-- 五、活动图建模 -->
+    <div class="card">
+        <h2>📋 五、活动图建模：业务流程执行</h2>
+        <h3>🎯 设计目标</h3>
+        <p>活动图用于描述业务流程的执行步骤，特别是包含决策、并发和循环的复杂流程。通过泳道（Swimlane）可清晰划分不同角色的职责。</p>
+
+        <h3>📊 课程创建与发布流程（含泳道）</h3>
+        <div class="plantuml-code" id="course-activity">@startuml
+title 逻辑视图 - 课程创建与发布流程
+!theme plain
+
+|教师|
+start
+:发起创建课程;
+|系统|
+:生成课程表单;
+|教师|
+:填写课程信息
+(标题, 描述, 时间等);
+|系统|
+:验证信息有效性;
+if (信息是否有效?) then (是)
+  |系统|
+  :保存课程信息
+  (状态: 草稿);
+  if (是否立即发布?) then (是)
+    |系统|
+    :更新课程状态
+    (状态: 已发布);
+    :通知学生
+    (课程可选);
+    stop
+  else (否)
+    |系统|
+    :保持课程状态
+    (状态: 草稿);
+    stop
+  endif
+else (否)
+  |教师|
+  :修改课程信息;
+  note right
+    信息不完整或格式错误
+  end note
+  |系统|
+  :重新验证;
+  note right
+    循环回到验证步骤
+  end note
+  -[#black]->信息是否有效?;
+endif
+@enduml</div>
+        <div class="diagram-explanation">
+            <strong>图2-4：OLMS 逻辑视图 - 课程创建与发布活动图</strong><br>
+            该活动图使用泳道清晰地划分了“教师”和“系统”的职责。它展示了从教师发起创建到系统最终发布或保存为草稿的完整流程。流程中的决策点（信息有效性、是否发布）和循环（信息无效时修改）都得到了体现。这有助于理解系统的业务逻辑流程和用户交互步骤。
+        </div>
+
+        <h3>📊 作业批改流程（含泳道）</h3>
+        <div class="plantuml-code" id="grading-activity">@startuml
+title 逻辑视图 - 作业批改流程
+!theme plain
+
+|教师|
+start
+:布置作业;
+|系统|
+:保存作业信息
+(状态: 已发布);
+|学生|
+:提交作业;
+|系统|
+:保存提交记录;
+|助教|
+:开始批改作业;
+|系统|
+:更新提交状态
+(状态: 批改中);
+|助教|
+:输入成绩和反馈;
+|系统|
+:保存批改结果
+(状态: 已批改);
+:通知学生;
+|学生|
+:查看成绩和反馈;
+stop
+@enduml</div>
+        <div class="diagram-explanation">
+            <strong>图2-5：OLMS 逻辑视图 - 作业批改活动图</strong><br>
+            本图展示了作业从布置到批改完成的完整流程。通过泳道明确了教师、学生、助教和系统各自的职责。系统在关键节点更新状态并发送通知，确保流程的透明性和及时性。
+        </div>
+    </div>
+
+    <!-- 六、给初学者的特别指导 -->
+    <div class="card">
+        <h2>💡 给初学者的特别指导：如何学好逻辑视图？</h2>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>从用例图出发：</strong><br>
+            用例图中的每个用例都对应逻辑视图中的一组类和交互。例如，“提交作业”用例会引出 <code>Assignment</code>、<code>Submission</code> 类。
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>理解关系类型：</strong><br>
+            <ul>
+                <li><strong>关联：</strong> A 使用 B（如学生选课）</li>
+                <li><strong>聚合：</strong> A 拥有 B，B 可独立（如课程包含资源）</li>
+                <li><strong>组合：</strong> A 拥有 B，B 不能独立（如课程包含选课记录）</li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>状态图三要素：</strong><br>
+            状态（State）、事件（Event）、动作（Action）。每个转换必须有触发事件。
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>活动图看流程：</strong><br>
+            关注决策点（菱形）、并发（分叉/汇合）、泳道（谁负责）。
+        </div>
+        <div class="success-box">
+            <strong>记住：</strong> 逻辑视图是系统设计的“骨架”。骨架搭好了，后续的开发、部署才有基础。不要急于画图，先理解业务！
+        </div>
+    </div>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 </p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <div class="footer">
+        <p>🌟 这是报告的 <strong>第二部分（Part 2）</strong>，完成了逻辑视图的详细建模。</p>
+        <p>📘 下一部分将深入 <strong>开发视图</strong>，展示微服务的代码组织与模块依赖。</p>
+        <p>👨‍🏫 西安邮电大学 · 拓守恒 · 2025</p>
+    </div>
+
+    <script>
+        document.querySelectorAll('.plantuml-code').forEach(codeBlock => {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = '复制';
+            copyBtn.onclick = function() {
+                const code = codeBlock.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    copyBtn.textContent = '已复制！';
+                    setTimeout(() => copyBtn.textContent = '复制', 2000);
+                });
+            };
+            codeBlock.appendChild(copyBtn);
+        });
+    </script>
+</body>
+</html>

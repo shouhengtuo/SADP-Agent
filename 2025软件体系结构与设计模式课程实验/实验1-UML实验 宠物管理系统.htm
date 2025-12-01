@@ -1,0 +1,862 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 实验一：UML建模综合实验 —— 智能宠物管理系统</title>
+    <style>
+        :root {
+            --primary: #007dfe;
+            --secondary: #4a90e2;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            position: relative;
+        }
+        .university-header {
+            background-color: #003d7a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+        h1 {
+            font-size: 2.2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+        }
+        h3 {
+            color: var(--dark);
+            margin-top: 30px;
+        }
+        h4 {
+            color: var(--dark);
+            margin-top: 20px;
+            font-weight: 600;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin: 10px 0 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .badge-primary { background-color: var(--primary); color: white; }
+        .badge-success { background-color: var(--success); color: white; }
+        .badge-warning { background-color: var(--warning); color: white; }
+        .badge-danger { background-color: var(--danger); color: white; }
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+        .plantuml-code {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            line-height: 1.5;
+            white-space: pre;
+            font-size: 14px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .step {
+            position: relative;
+            padding-left: 30px;
+            margin: 25px 0;
+        }
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 25px;
+            height: 25px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .tip-box {
+            background-color: #e6f7ff;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .warning-box {
+            background-color: #fff7e6;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .success-box {
+            background-color: #f6ffed;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .deliverable-table {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .deliverable-table th, .deliverable-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .deliverable-table th {
+            background-color: #f0f5ff;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--gray);
+            border-top: 1px solid #eee;
+        }
+        .codearts-logo {
+            display: inline-block;
+            background-color: #007dfe;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .author-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        .report-requirement {
+            background-color: #fff8e6;
+            border: 2px solid #ffc53d;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 30px 0;
+        }
+        .report-section {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #fafafa;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .figure-caption {
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0 5px;
+            font-style: italic;
+        }
+        .figure-explanation {
+            background-color: #f0f7ff;
+            padding: 10px;
+            border-radius: var(--border-radius);
+            margin: 5px 0 15px;
+            border-left: 3px solid var(--secondary);
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            header {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="university-header">
+        <h2>西安邮电大学 · 软件工程实验指导书</h2>
+       
+    </div>
+
+    <header>
+        <h1>🧪 实验：UML建模综合实验 —— 智能宠物管理系统</h1>
+        <div class="subtitle">
+            <span class="badge badge-primary">🕒 2学时</span>
+            <span class="badge badge-success">🎯 掌握UML四大图</span>
+            <span class="badge badge-warning">💻 基于华为CodeArts平台</span>
+            <span class="badge badge-danger">👨‍🏫 拓守恒教授设计</span>
+        </div>
+    </header>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 教授</p>
+        <p>版权所有 © 2025 西安邮电大学 拓守恒</p>
+    </div>
+
+    <div class="card">
+        <h2>📘 一、PlantUML 快速入门（学生友好版）</h2>
+        <div class="tip-box">
+            💡 <strong>为什么学习 PlantUML？</strong><br>
+            PlantUML 是一种<strong>基于文本的 UML 建模工具</strong>，通过编写简单语法即可自动生成专业 UML 图形。无需拖拽、无需安装复杂软件，支持在线编辑、版本控制、团队协作，是敏捷开发和教学实验的理想选择！
+        </div>
+
+        <h3>✅ PlantUML 核心优势：</h3>
+        <table>
+            <tr>
+                <th>优势</th>
+                <th>说明</th>
+            </tr>
+            <tr>
+                <td>📝 文本驱动</td>
+                <td>用代码写图，易修改、易复用、易版本管理</td>
+            </tr>
+            <tr>
+                <td>🌐 在线可用</td>
+                <td><a href="https://www.plantuml.com/plantuml" target="_blank">https://www.plantuml.com/plantuml</a> 即开即用</td>
+            </tr>
+            <tr>
+                <td>🖼️ 自动绘图</td>
+                <td>输入文本 → 自动生成 PNG/SVG/PDF</td>
+            </tr>
+            <tr>
+                <td>🧩 支持所有UML图</td>
+                <td>用例图、类图、序列图、状态图等一应俱全</td>
+            </tr>
+        </table>
+
+        <h3>🧩 基础语法示例（快速上手）</h3>
+        
+        <h4>1. 用例图（Use Case Diagram）</h4>
+        <div class="plantuml-code">@startuml
+actor 主人 as Owner
+actor 兽医 as Vet
+actor 系统管理员 as Admin
+
+rectangle "智能宠物管理系统" {
+  Owner --> (创建宠物档案)
+  Owner --> (设置喂食计划)
+  Owner --> (查看健康数据)
+  Owner --> (接收异常提醒)
+
+  Vet --> (查看宠物病历)
+  Vet --> (提交诊断报告)
+
+  Admin --> (管理用户权限)
+  Admin --> (同步云端数据)
+}
+@enduml</div>
+
+        <h4>2. 类图（Class Diagram）</h4>
+        <div class="plantuml-code">@startuml
+class Pet {
+  -petId: String
+  -name: String
+  -species: String
+  -healthStatus: String
+  +updateHealthData()
+}
+
+class Owner {
+  -ownerId: String
+  -name: String
+  +addPet()
+  +setFeedingPlan()
+}
+
+class FeedingPlan {
+  -planId: String
+  -time: DateTime
+  -foodType: String
+  +triggerReminder()
+}
+
+Pet "1" -- "1..*" Owner
+Owner "1" -- "0..*" FeedingPlan
+@enduml</div>
+
+        <h4>3. 序列图（Sequence Diagram）——“设置喂食提醒”</h4>
+        <div class="plantuml-code">@startuml
+actor 主人
+participant "App界面" as UI
+participant "提醒服务" as AlertService
+participant "云数据库" as CloudDB
+
+主人 -> UI: 点击“设置喂食提醒”
+UI -> AlertService: createReminder(time, food)
+AlertService -> CloudDB: saveReminder()
+CloudDB --> AlertService: success
+AlertService --> UI: 显示“设置成功”
+UI --> 主人: 提示设置完成
+@enduml</div>
+
+        <h4>4. 状态图（State Diagram）——宠物健康状态变迁</h4>
+        <div class="plantuml-code">@startuml
+[*] --> 健康
+
+健康 --> 亚健康: 连续3天活动量下降\n或进食异常
+亚健康 --> 生病: 体温异常\n或兽医标记
+生病 --> 康复: 治疗完成\n数据恢复正常
+康复 --> 健康: 连续7天数据正常
+
+亚健康 --> 健康: 数据恢复正常
+生病 --> 亚健康: 初步治疗有效
+
+健康 --> [*]
+@enduml</div>
+
+        <h3>🖥️ 如何使用 PlantUML？</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            打开在线编辑器 → <a href="https://www.plantuml.com/plantuml" target="_blank">https://www.plantuml.com/plantuml</a>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            粘贴上述任一代码 → 实时预览图形
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            点击 <code>Download PNG</code> 或 <code>Download SVG</code> 保存图片
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            也可使用 VS Code + PlantUML 插件本地编辑（推荐进阶用户）
+        </div>
+        
+        <div class="tip-box">
+            ✅ <strong>提示：</strong> 所有图建议保存为 <code>.puml</code> 文本文件 + 导出 <code>.png</code> 图片，便于修改和提交！
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🧭 二、实验详细步骤</h2>
+        
+        <h3>🔹 步骤 1：登录 CodeArts 并创建项目</h3>
+        <div class="codearts-logo">华为CodeArts</div>
+        <div class="step">
+            <div class="step-number">1</div>
+            登录 <a href="https://devcloud.huaweicloud.com/" target="_blank">华为 CodeArts</a>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            创建新项目 → 项目名称：<code>SmartPet_UML</code>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            项目模板选择：“空白项目”或“文档协作项目”
+        </div>
+
+        <h3>🔹 步骤 2：绘制 4 类 UML 图（使用 PlantUML）</h3>
+        <div class="tip-box">
+            🎯 <strong>要求：</strong> 命名规范、内容完整、逻辑清晰
+        </div>
+
+        <h4>🖼️ 图1：用例图 <code>UseCase_SmartPet.puml</code></h4>
+        <p><strong>要求：3角色 + 8用例</strong></p>
+        <div class="plantuml-code">@startuml
+left to right direction
+actor "主人" as Owner
+actor "兽医" as Vet
+actor "系统管理员" as Admin
+
+rectangle "智能宠物管理系统" {
+  Owner --> (创建/编辑宠物档案)
+  Owner --> (设置每日喂食计划)
+  Owner --> (查看实时健康数据)
+  Owner --> (接收异常健康提醒)
+
+  Vet --> (访问宠物历史病历)
+  Vet --> (录入诊断与处方)
+
+  Admin --> (管理用户与权限)
+  Admin --> (触发云端数据同步)
+}
+@enduml</div>
+        <div class="success-box">
+            ✅ <strong>导出文件：</strong> <code>UseCase_SmartPet.png</code>
+        </div>
+
+        <h4>🖼️ 图2：类图 <code>Class_SmartPet.puml</code></h4>
+        <p><strong>要求：至少8个类，体现关联</strong></p>
+        <div class="plantuml-code">@startuml
+
+class Pet {
+  -petId: String
+  -name: String
+  -species: String
+  -birthDate: Date
+  -healthStatus: String
+  +updateStatus(newStatus: String)
+}
+
+class Owner {
+  -ownerId: String
+  -name: String
+  -phone: String
+  +addPet(pet: Pet)
+  +setFeedingPlan(plan: FeedingPlan)
+}
+
+class FeedingPlan {
+  -planId: String
+  -scheduledTime: DateTime
+  -foodType: String
+  -isRecurring: Boolean
+  +activateReminder()
+}
+
+class HealthMonitor {
+  -sensorId: String
+  -lastReading: Double
+  -unit: String
+  +collectData()
+  +detectAnomaly()
+}
+
+class AlertService {
+  -alertId: String
+  -message: String
+  -sentTime: DateTime
+  +sendAlertToOwner()
+}
+
+class CloudSyncService {
+  +syncDataToCloud()
+  +fetchLatestData()
+}
+
+class VetRecord {
+  -recordId: String
+  -diagnosis: String
+  -prescription: String
+  -vetId: String
+}
+
+class SystemAdmin {
+  -adminId: String
+  +manageUserAccess()
+  +triggerSync()
+}
+
+Owner "1" -- "0..*" Pet
+Owner "1" -- "0..*" FeedingPlan
+Pet "1" -- "1" HealthMonitor
+HealthMonitor --> AlertService : 异常时触发
+Owner --> AlertService : 接收提醒
+CloudSyncService ..> Pet : 同步数据
+CloudSyncService ..> HealthMonitor : 同步数据
+SystemAdmin --> CloudSyncService : 手动触发
+VetRecord -- Pet
+@enduml</div>
+        <div class="success-box">
+            ✅ <strong>导出文件：</strong> <code>Class_SmartPet.png</code>
+        </div>
+
+        <h4>🖼️ 图3：序列图 <code>Sequence_SetReminder.puml</code></h4>
+        <p><strong>描述：“主人设置喂食提醒”完整流程</strong></p>
+        <div class="plantuml-code">@startuml
+title 设置喂食提醒流程
+
+actor 主人
+participant "手机App" as App
+participant "提醒服务" as ReminderService
+participant "数据库" as DB
+participant "推送服务" as PushService
+
+主人 -> App: 选择宠物，设置喂食时间/食物
+App -> ReminderService: createReminder(petId, time, food)
+ReminderService -> DB: 保存提醒记录
+DB --> ReminderService: 保存成功
+ReminderService -> PushService: 注册定时推送
+PushService --> ReminderService: 注册成功
+ReminderService --> App: 返回“设置成功”
+App --> 主人: 显示“✅ 喂食提醒已设置”
+
+note right of PushService
+  到时间后自动推送通知给主人
+end note
+@enduml</div>
+        <div class="success-box">
+            ✅ <strong>导出文件：</strong> <code>Sequence_SetReminder.png</code>
+        </div>
+
+        <h4>🖼️ 图4：状态图 <code>State_PetHealth.puml</code></h4>
+        <p><strong>描述：宠物健康状态变迁逻辑</strong></p>
+        <div class="plantuml-code">@startuml
+title 宠物健康状态机
+
+[*] --> 健康
+
+健康 --> 亚健康: 检测到\n·连续3天活动量<阈值\n·进食量下降20%
+亚健康 --> 生病: \n·体温>39.5℃持续6小时\n·兽医手动标记
+生病 --> 康复: \n·治疗记录完成\n·连续2天数据正常
+康复 --> 健康: \n·连续7天所有指标正常
+
+亚健康 --> 健康: 数据恢复达标
+生病 --> 亚健康: 治疗初步见效\n但未完全康复
+
+健康 --> [*]
+
+note right of 生病
+  系统自动通知主人和兽医
+end note
+
+@enduml</div>
+        <div class="success-box">
+            ✅ <strong>导出文件：</strong> <code>State_PetHealth.png</code>
+        </div>
+
+        <h3>🔹 步骤 3：导出与提交</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            将4张图分别导出为 PNG 格式（推荐）或 PDF
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            文件命名：
+            <ul>
+                <li><code>UseCase_SmartPet.png</code></li>
+                <li><code>Class_SmartPet.png</code></li>
+                <li><code>Sequence_SetReminder.png</code></li>
+                <li><code>State_PetHealth.png</code></li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            登录 CodeArts → 进入项目 <code>SmartPet_UML</code>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            进入 <strong>“文档” → “UML设计”</strong> 目录（如无则新建）
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            上传全部4张图片 + 可选上传 <code>.puml</code> 源文件（加分项）
+        </div>
+
+        <h3>🔹 步骤 4：小组互评（CodeArts 评审功能）</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            教师创建“评审任务”，指定评审分组
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            学生进入“评审”模块 → 查看分配的他人作品
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            依据评分标准填写评审意见（完整性/规范性/逻辑性）
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            提交评审，系统自动汇总评分
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📊 三、评分标准（总分100分）</h2>
+        <table>
+            <tr>
+                <th>维度</th>
+                <th>分值</th>
+                <th>评分细则</th>
+            </tr>
+            <tr>
+                <td><strong>完整性</strong></td>
+                <td>40%</td>
+                <td>4张图齐全、角色/用例/类/流程/状态无缺失，满足实验要求</td>
+            </tr>
+            <tr>
+                <td><strong>规范性</strong></td>
+                <td>30%</td>
+                <td>命名符合要求、PlantUML语法正确、图形布局清晰、无错别字</td>
+            </tr>
+            <tr>
+                <td><strong>逻辑合理性</strong></td>
+                <td>30%</td>
+                <td>类关联合理、序列流程符合现实、状态变迁有依据、无逻辑矛盾</td>
+            </tr>
+        </table>
+        
+        <div class="success-box">
+            ✅ <strong>加分项（+5分）：</strong>
+            <ul>
+                <li>提交 <code>.puml</code> 源码文件</li>
+                <li>使用注释说明关键设计</li>
+                <li>状态图/序列图包含“异常分支”或“并发处理”</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>📌 四、实验交付物清单</h2>
+        <table class="deliverable-table">
+            <tr>
+                <th>文件名</th>
+                <th>类型</th>
+                <th>说明</th>
+            </tr>
+            <tr>
+                <td><code>UseCase_SmartPet.png</code></td>
+                <td>图片</td>
+                <td>用例图，含3角色8用例</td>
+            </tr>
+            <tr>
+                <td><code>Class_SmartPet.png</code></td>
+                <td>图片</td>
+                <td>类图，至少8个类，体现关联</td>
+            </tr>
+            <tr>
+                <td><code>Sequence_SetReminder.png</code></td>
+                <td>图片</td>
+                <td>序列图，描述喂食提醒流程</td>
+            </tr>
+            <tr>
+                <td><code>State_PetHealth.png</code></td>
+                <td>图片</td>
+                <td>状态图，健康状态变迁逻辑</td>
+            </tr>
+            <tr>
+                <td>（可选）<code>*.puml</code></td>
+                <td>源码</td>
+                <td>PlantUML 文本源文件，便于评审和复用</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>💡 五、常见问题与提示</h2>
+        
+        <h3>❓ Q1：我不会画类之间的关系怎么办？</h3>
+        <div class="tip-box">
+            ✅ <strong>记住口诀：</strong>
+            <ul>
+                <li>“拥有” → 实线实心菱形（组合）或实线空心菱形（聚合）</li>
+                <li>“使用” → 虚线箭头（依赖）</li>
+                <li>“是一种” → 实线空心三角（继承）</li>
+                <li>“知道” → 实线箭头（关联）</li>
+            </ul>
+        </div>
+
+        <h3>❓ Q2：状态图中的“触发条件”怎么写？</h3>
+        <div class="tip-box">
+            ✅ <strong>使用自然语言描述触发事件</strong>，例如：
+            <div class="plantuml-code">健康 --> 亚健康: 连续3天进食量下降</div>
+        </div>
+
+        <h3>❓ Q3：序列图中对象太多怎么办？</h3>
+        <div class="tip-box">
+            ✅ <strong>只保留核心参与对象（4~6个为佳）</strong>，避免信息过载。非核心服务可合并或省略。
+        </div>
+
+        <h3>❓ Q4：导出的图太小/文字看不清？</h3>
+        <div class="tip-box">
+            ✅ 在 PlantUML 在线编辑器中，在代码第一行加入：
+            <div class="plantuml-code">@startuml
+skinparam dpi 300
+skinparam defaultFontName 微软雅黑
+skinparam defaultFontSize 14
+...
+</div>
+            可提升清晰度和字体可读性。
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🎓 六、实验总结与思考题（选做）</h2>
+        <ol>
+            <li>如果加入“智能硬件设备”（如喂食器、体温贴），类图应如何扩展？</li>
+            <li>在序列图中，如果“云端同步失败”，应如何设计异常处理流程？</li>
+            <li>状态图中，“康复”是否应该直接回到“健康”？为什么？</li>
+        </ol>
+        
+        <div class="tip-box">
+            📝 <strong>建议：</strong> 在 CodeArts 文档中新建“实验反思”页面，记录设计心得与改进思路。
+        </div>
+    </div>
+
+   
+
+    <!-- 新增：学生实验报告撰写要求 -->
+    <div class="report-requirement">
+        <h2>📝 八、学生实验报告撰写要求</h2>
+        <p>根据软件设计说明书标准格式撰写实验报告，要求结构完整、图文并茂、逻辑清晰、分析深入。</p>
+        
+        <div class="report-section">
+            <h3>1. 报告基本结构要求</h3>
+            <ol>
+                <li><strong>封面页</strong>：包含实验名称、课程名称、学生姓名、学号、班级、实验日期、指导教师（拓守恒教授）</li>
+                <li><strong>目录</strong>：自动生成目录，包含各级标题和页码</li>
+                <li><strong>引言/概述</strong>：简述实验目的、实验环境、实验工具（PlantUML、CodeArts）</li>
+                <li><strong>需求分析</strong>：详细描述智能宠物管理系统的功能需求和非功能需求</li>
+                <li><strong>系统设计</strong>：包含所有UML图及详细说明（重点部分）</li>
+                <li><strong>实验过程</strong>：记录实验步骤、遇到的问题及解决方案</li>
+                <li><strong>实验结果</strong>：展示最终成果，分析设计合理性</li>
+                <li><strong>总结与反思</strong>：实验收获、不足之处、改进建议</li>
+                <li><strong>参考文献</strong>：列出参考的资料、工具文档等</li>
+            </ol>
+        </div>
+        
+        <div class="report-section">
+            <h3>2. 图文规范要求</h3>
+            <ul>
+                <li>所有图表必须有<strong>图题（Figure Caption）</strong>和<strong>图的解释说明</strong></li>
+                <li>图题格式：<code>图X-Y 图表名称</code>（如：图3-1 用例图）</li>
+                <li>图题位于图下方，居中，使用<strong>五号宋体加粗</strong></li>
+                <li>图的解释说明位于图题下方，使用<strong>小五号宋体</strong>，解释图中关键元素、设计思路和逻辑关系</li>
+                <li>图片清晰度不低于300dpi，大小适中，布局合理</li>
+                <li>所有UML图必须与PlantUML源代码对应，确保一致性</li>
+            </ul>
+            
+            <div class="figure-caption">示例：图3-1 智能宠物管理系统用例图</div>
+            <div class="figure-explanation">
+                本用例图展示了系统三大角色（主人、兽医、系统管理员）与八个核心用例的交互关系。主人可执行宠物档案管理、喂食计划设置、健康数据查看和异常提醒接收；兽医负责病历访问和诊断报告录入；系统管理员管理用户权限和数据同步。各角色职责分明，用例覆盖系统核心功能。
+            </div>
+        </div>
+        
+        <div class="report-section">
+            <h3>3. 内容深度要求</h3>
+            <ul>
+                <li><strong>用例图</strong>：不仅要展示角色与用例关系，还需说明各用例的简要描述和前置/后置条件</li>
+                <li><strong>类图</strong>：详细说明每个类的属性和方法设计理由，类间关系的业务含义</li>
+                <li><strong>序列图</strong>：分析消息传递的时序逻辑，说明各对象的职责和协作方式</li>
+                <li><strong>状态图</strong>：解释状态变迁的触发条件和业务规则，说明状态机设计的合理性</li>
+                <li>每个图的解释说明不少于150字，需体现个人思考和理解</li>
+            </ul>
+        </div>
+        
+        <div class="report-section">
+            <h3>4. 格式与排版要求</h3>
+            <ul>
+                <li>使用Word或PDF格式提交，文件命名：<code>学号_姓名_智能宠物管理系统UML设计报告.docx/pdf</code></li>
+                <li>正文使用<strong>小四号宋体</strong>，1.5倍行距</li>
+                <li>一级标题<strong>三号黑体</strong>，二级标题<strong>四号黑体</strong>，三级标题<strong>小四号黑体</strong></li>
+                <li>页边距：上2.54cm，下2.54cm，左3.17cm，右3.17cm</li>
+                <li>页码位于页面底端居中</li>
+                <li>参考文献格式规范，不少于3篇参考文献</li>
+            </ul>
+        </div>
+        
+        <div class="report-section">
+            <h3>5. 评分细则（报告部分）</h3>
+            <table>
+                <tr>
+                    <th>评分项</th>
+                    <th>分值</th>
+                    <th>评分标准</th>
+                </tr>
+                <tr>
+                    <td>结构完整性</td>
+                    <td>20%</td>
+                    <td>报告结构完整，包含所有要求的部分</td>
+                </tr>
+                <tr>
+                    <td>图文规范性</td>
+                    <td>30%</td>
+                    <td>图表有图题和解释说明，格式规范，排版美观</td>
+                </tr>
+                <tr>
+                    <td>内容深度</td>
+                    <td>30%</td>
+                    <td>对UML图的解释深入，体现个人理解和思考</td>
+                </tr>
+                <tr>
+                    <td>格式规范性</td>
+                    <td>20%</td>
+                    <td>符合排版要求，无格式错误</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="warning-box">
+            ⚠️ <strong>重要提醒：</strong>
+            <ul>
+                <li>严禁抄袭他人报告，一经发现按学术不端处理</li>
+                <li>报告必须包含个人真实思考和分析，不能仅复制指导书内容</li>
+                <li>图的解释说明是评分重点，务必认真撰写</li>
+                <li>提交截止日期：实验结束后一周内</li>
+                <li>提交平台：华为CodeArts → SmartPet_UML项目 → 文档库</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 教授</p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <div class="footer">
+        <div class="codearts-logo">华为CodeArts教学实验平台</div>
+        <p>🌟 祝你顺利完成实验！用代码绘图，让设计更清晰、协作更高效！</p>
+        <p>📘 西安邮电大学 · 拓守恒教授设计 · 适配高校软件工程/UML课程 · 2025春季版</p>
+    </div>
+</body>
+</html>
+```

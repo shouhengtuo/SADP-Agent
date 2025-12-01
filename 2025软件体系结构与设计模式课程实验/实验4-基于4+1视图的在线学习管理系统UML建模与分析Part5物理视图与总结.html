@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 实验：基于4+1视图的在线学习管理系统UML建模与分析（Part 5）</title>
+    <style>
+        :root {
+            --primary: #4a6cf7;
+            --secondary: #6c757d;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --info: #1890ff;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), #3a57e8);
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+        .university-header {
+            background-color: #003d7a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+        h1 {
+            font-size: 2.4rem;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: var(--dark);
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        h4 {
+            color: var(--dark);
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin: 15px 0 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .badge-primary { background-color: var(--primary); color: white; }
+        .badge-success { background-color: var(--success); color: white; }
+        .badge-warning { background-color: var(--warning); color: white; }
+        .badge-danger { background-color: var(--danger); color: white; }
+        .badge-info { background-color: var(--info); color: white; }
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+        .plantuml-code {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 25px 0;
+            line-height: 1.6;
+            white-space: pre;
+            font-size: 14px;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: #3a57e8;
+        }
+        .step {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .step-number {
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .tip-box {
+            background-color: #e6f7ff;
+            border-left: 6px solid var(--info);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .warning-box {
+            background-color: #fff7e6;
+            border-left: 6px solid var(--warning);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .success-box {
+            background-color: #f6ffed;
+            border-left: 6px solid var(--success);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .diagram-explanation {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .author-info {
+            background: linear-gradient(135deg, #f0f5ff, #e6f2ff);
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--secondary);
+            border-top: 2px solid #eee;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            header { padding: 25px; }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="university-header">
+        <h2>西安邮电大学 · 软件工程实验指导书（4+1视图）</h2>
+        <p>报告设计者和主讲教师：拓守恒 </p>
+    </div>
+    <header>
+        <h1>🎓 基于4+1视图的在线学习管理系统UML建模与分析（Part 5: 物理视图与总结）</h1>
+        <div class="subtitle">
+            <span class="badge badge-primary">4+1视图架构</span>
+            <span class="badge badge-info">UML建模综合应用</span>
+            <span class="badge badge-success">系统设计能力培养</span>
+            <span class="badge badge-warning">👨‍🏫 拓守恒     实验指导书</span>
+        </div>
+    </header>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 </p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <!-- 一、物理视图概述 -->
+    <div class="card">
+        <h2>🌍 一、物理视图概述</h2>
+        <h3>🎯 目标与作用</h3>
+        <p><strong>物理视图</strong>（Physical View），也称为<strong>部署视图</strong>，描述软件系统如何部署到物理或虚拟硬件环境中。它关注：</p>
+        <ul>
+            <li>服务器、容器、网络设备等物理/虚拟节点</li>
+            <li>软件组件（服务、数据库、中间件）在节点上的分布</li>
+            <li>节点间的网络连接与通信方式</li>
+            <li>高可用、负载均衡、容灾备份等运维策略</li>
+        </ul>
+        <p>对于 OLMS 微服务系统，物理视图将展示其在云平台（如 Kubernetes）上的完整部署架构。</p>
+
+        <h3>🔧 物理视图 vs 开发视图</h3>
+        <div class="tip-box">
+            <strong>开发视图</strong>关注“代码如何组织”（逻辑模块）<br>
+            <strong>物理视图</strong>关注“代码运行在哪里”（物理/虚拟节点）<br><br>
+            例如，开发视图中的“课程服务”包，在物理视图中可能部署为多个 Docker 容器实例，运行在 Kubernetes 集群的不同节点上。
+        </div>
+    </div>
+
+    <!-- 二、部署环境说明 -->
+    <div class="card">
+        <h2>☁️ 二、部署环境说明</h2>
+        <p>OLMS 系统采用云原生架构，部署在 Kubernetes 集群中，具体环境如下：</p>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>基础设施：</strong> 公有云（如阿里云、华为云）或私有云（OpenStack）
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>容器平台：</strong> Kubernetes（K8s），负责容器编排、自动扩缩容、服务发现
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>镜像仓库：</strong> Harbor 或 Docker Hub，存储 Docker 镜像
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>网络模型：</strong> CNI（如 Calico），提供 Pod 间通信
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <strong>存储方案：</strong> 本地 SSD + 云盘（用于数据库持久化）
+        </div>
+    </div>
+
+    <!-- 三、部署图建模 -->
+    <div class="card">
+        <h2>📦 三、部署图建模：系统拓扑结构</h2>
+        <h3>📊 OLMS 系统部署图</h3>
+        <div style="background-color: #f9f9f9; border: 2px dashed #ddd; border-radius: 8px; padding: 30px; margin: 30px 0; text-align: center;">
+            <div class="mermaid" style="text-align: center;">
+                graph TB
+                    subgraph "互联网"
+                        A["📱 用户终端"]
+                    end
+
+                    subgraph "DMZ区"
+                        B["🔄 负载均衡器"]
+                        C["🔗 API网关集群"]
+                        D["📦 CDN节点"]
+                    end
+
+                    subgraph "Kubernetes集群"
+                        E["🌐 Nginx Ingress Controller"]
+
+                        subgraph "微服务层"
+                            F["🔐 用户服务"]
+                            G["📚 课程服务"]
+                            H["🎥 直播服务"]
+                            I["📝 作业服务"]
+                            J["💬 社区服务"]
+                        end
+
+                        subgraph "中间件层"
+                            K["📡 RabbitMQ集群"]
+                            L["⚡ Redis集群"]
+                            M["⚙️ 配置中心"]
+                        end
+                    end
+
+                    subgraph "数据层"
+                        N["💾 MySQL主从集群"]
+                        O["🗄️ PostgreSQL集群"]
+                        P["📦 MongoDB集群"]
+                        Q["🔍 Elasticsearch集群"]
+                    end
+
+                    subgraph "监控运维层"
+                        R["📈 Prometheus"]
+                        S["📊 Grafana"]
+                        T["🔍 ELK Stack"]
+                    end
+
+                    subgraph "存储层"
+                        U["☁️ 对象存储"]
+                        V["🔄 备份系统"]
+                    end
+
+                    A --> B
+                    A --> D
+                    B --> C
+                    C --> E
+                    E --> F
+                    E --> G
+                    E --> H
+                    E --> I
+                    E --> J
+                    F --> N
+                    F --> L
+                    G --> O
+                    G --> L
+                    H --> L
+                    H --> U
+                    I --> P
+                    J --> Q
+                    K --> F
+                    K --> G
+                    K --> H
+                    M --> F
+                    M --> G
+                    M --> H
+                    R --> F
+                    R --> G
+                    R --> H
+                    R --> N
+                    R --> L
+                    R --> K
+                    S --> R
+                    T --> F
+                    T --> G
+                    T --> H
+                    N --> V
+                    O --> V
+                    P --> V
+                    Q --> V
+            </div>
+        </div>
+        <div class="diagram-explanation">
+            <strong>图5-1：OLMS 系统部署图说明（优化版）</strong><br>
+            本图展示了 OLMS 系统在云平台上的完整部署架构：<br>
+            <ul>
+                <li><strong>用户终端：</strong> 通过 Web 或移动 App 访问系统</li>
+                <li><strong>DMZ区：</strong> 包含负载均衡器、API网关和CDN，提供安全接入和流量分发</li>
+                <li><strong>微服务层：</strong> 采用微服务架构，各服务独立部署、独立扩展</li>
+                <li><strong>中间件层：</strong> 提供消息队列、缓存、配置等公共服务</li>
+                <li><strong>数据层：</strong> 采用不同类型的数据库满足不同业务需求</li>
+                <li><strong>监控运维层：</strong> 提供全链路监控、可视化展示和日志分析</li>
+                <li><strong>存储层：</strong> 提供对象存储和数据备份功能</li>
+            </ul>
+        </div>
+
+        <h3>📋 PlantUML 代码实现</h3>
+        <div class="plantuml-code">
+@startuml OLMS优化部署图
+!theme plain
+skinparam monochrome true
+skinparam linetype ortho
+skinparam nodesep 100
+skinparam ranksep 100
+title 在线学习管理系统优化部署架构
+rectangle "互联网" as internet {
+    rectangle "用户终端" as client
+}
+rectangle "DMZ区" as dmz {
+    rectangle "负载均衡器" as lb
+    rectangle "API网关集群" as api
+    rectangle "CDN节点" as cdn
+}
+rectangle "Kubernetes集群" as k8s {
+    rectangle "接入层" as ingress {
+        rectangle "Nginx Ingress Controller" as ingress_ctrl
+    }
+    rectangle "微服务层" as services {
+        rectangle "用户服务" as user_service
+        rectangle "课程服务" as course_service
+        rectangle "直播服务" as live_service
+        rectangle "作业服务" as homework_service
+        rectangle "社区服务" as community_service
+    }
+    rectangle "中间件层" as middleware {
+        rectangle "RabbitMQ集群" as rabbitmq
+        rectangle "Redis集群" as redis
+        rectangle "配置中心" as config
+    }
+}
+rectangle "数据层" as data {
+    rectangle "MySQL主从集群" as mysql
+    rectangle "PostgreSQL集群" as postgres
+    rectangle "MongoDB集群" as mongodb
+    rectangle "Elasticsearch集群" as es
+}
+rectangle "监控运维层" as monitor {
+    rectangle "Prometheus" as prometheus
+    rectangle "Grafana" as grafana
+    rectangle "ELK Stack" as elk
+}
+rectangle "存储层" as storage {
+    rectangle "对象存储" as oss
+    rectangle "备份系统" as backup
+}
+' 连接关系
+client --> lb
+lb --> api
+lb --> cdn
+api --> ingress_ctrl
+ingress_ctrl --> user_service
+ingress_ctrl --> course_service
+ingress_ctrl --> live_service
+ingress_ctrl --> homework_service
+ingress_ctrl --> community_service
+user_service --> mysql
+user_service --> redis
+course_service --> postgres
+course_service --> redis
+live_service --> redis
+live_service --> oss
+homework_service --> mongodb
+community_service --> es
+rabbitmq --> user_service
+rabbitmq --> course_service
+rabbitmq --> live_service
+config --> user_service
+config --> course_service
+config --> live_service
+prometheus --> user_service
+prometheus --> course_service
+prometheus --> live_service
+prometheus --> mysql
+prometheus --> redis
+prometheus --> rabbitmq
+grafana --> prometheus
+elk --> user_service
+elk --> course_service
+elk --> live_service
+mysql --> backup
+postgres --> backup
+mongodb --> backup
+es --> backup
+' 数据库主从关系
+mysql "1" -[#blue]-> "2" : 主从复制
+postgres "1" -[#blue]-> "2" : 主从复制
+mongodb "3" -[#blue]-> "3" : 副本集
+' Redis集群
+redis "3" -[#blue]-> "3" : 主从集群
+' 标注
+note top of lb : HAProxy/Keepalived\n双活部署
+note top of api : Kong/Nginx\n统一认证限流
+note top of live_service : 动态扩缩容\n基于并发用户数
+note top of mysql : 读写分离\n主从故障转移
+note top of prometheus : 全链路监控\n实时告警
+note top of elk : 日志收集\n异常分析
+@enduml
+        </div>
+    </div>
+
+    
+
+  
+
+    <!-- 视图整合总结 -->
+    <div class="card">
+        <h2>🔗 六、五视图整合总结</h2>
+        <p>4+1 视图不是孤立的，而是相互关联、协同工作的整体。下表总结了 OLMS 系统中五视图的关系：</p>
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+                <tr style="background-color: #e9ecef;">
+                    <th style="border: 1px solid #ccc; padding: 12px; text-align: center;">视图</th>
+                    <th style="border: 1px solid #ccc; padding: 12px; text-align: center;">核心问题</th>
+                    <th style="border: 1px solid #ccc; padding: 12px; text-align: center;">驱动关系</th>
+                    <th style="border: 1px solid #ccc; padding: 12px; text-align: center;">OLMS 示例</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 12px; font-weight: bold; background-color: #f8f9fa;">场景视图</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">系统做什么？</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">→ 驱动其他所有视图</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">“直播授课”用例</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 12px; font-weight: bold; background-color: #f8f9fa;">逻辑视图</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">功能如何组织？</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">← 场景；→ 开发</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">Course、LiveStream 类设计</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 12px; font-weight: bold; background-color: #f8f9fa;">开发视图</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">代码如何组织？</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">← 逻辑；→ 物理</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">live-service 微服务模块</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 12px; font-weight: bold; background-color: #f8f9fa;">进程视图</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">运行时如何交互？</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">← 场景；← 逻辑</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">直播授课序列图</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 12px; font-weight: bold; background-color: #f8f9fa;">物理视图</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">部署到哪里？</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">← 开发；← 进程</td>
+                    <td style="border: 1px solid #ccc; padding: 12px;">Kubernetes 部署架构</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="success-box">
+            <strong>关键结论：</strong><br>
+            <ul>
+                <li>场景视图是“需求源头”，其他视图都是对它的细化和实现</li>
+                <li>逻辑视图和开发视图关注“静态结构”，进程视图和物理视图关注“动态行为”</li>
+                <li>五视图共同构成完整的软件架构描述，缺一不可</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 七、给初学者的学习路径建议 -->
+    <div class="card">
+        <h2>💡 七、给初学者的学习路径建议</h2>
+        <h3>📌 推荐学习顺序</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>先学场景视图：</strong> 用例图 → 理解用户需求
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>再学逻辑视图：</strong> 类图/状态图 → 理解业务对象
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>接着学开发视图：</strong> 包图 → 理解代码组织
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>然后学进程视图：</strong> 序列图 → 理解运行时交互
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <strong>最后学物理视图：</strong> 部署图 → 理解系统部署
+        </div>
+
+        <h3>✅ 实验成果要求</h3>
+        <div class="tip-box">
+            <strong>完整实验报告应包含：</strong>
+            <ul>
+                <li>Part 1：场景视图（用例图 + 用例描述）</li>
+                <li>Part 2：逻辑视图（类图 + 状态图 + 活动图）</li>
+                <li>Part 3：开发视图（包图 + 代码结构）</li>
+                <li>Part 4：进程视图（序列图 + 通信机制）</li>
+                <li>Part 5：物理视图（部署图 + 运维设计） + 五视图总结</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 </p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <div class="footer">
+        <p>🎉 <strong>恭喜！你已完整学习基于4+1视图的软件架构设计方法。</strong></p>
+        <p>📘 本实验报告共5部分，覆盖了从需求到部署的完整软件工程流程。</p>
+        <p>👨‍🏫 西安邮电大学 · 拓守恒 2025季版</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.plantuml-code').forEach(codeBlock => {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = '复制';
+            copyBtn.onclick = function() {
+                const code = codeBlock.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    copyBtn.textContent = '已复制！';
+                    setTimeout(() => copyBtn.textContent = '复制', 2000);
+                });
+            };
+            codeBlock.appendChild(copyBtn);
+        });
+    </script>
+</body>
+</html>

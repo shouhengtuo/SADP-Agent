@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 实验：基于4+1视图的在线学习管理系统UML建模与分析（Part 1）</title>
+    <style>
+        :root {
+            --primary: #4a6cf7;
+            --secondary: #6c757d;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --info: #1890ff;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), #3a57e8);
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+        .university-header {
+            background-color: #003d7a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+        h1 {
+            font-size: 2.4rem;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: var(--dark);
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        h4 {
+            color: var(--dark);
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin: 15px 0 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .badge-primary { background-color: var(--primary); color: white; }
+        .badge-success { background-color: var(--success); color: white; }
+        .badge-warning { background-color: var(--warning); color: white; }
+        .badge-danger { background-color: var(--danger); color: white; }
+        .badge-info { background-color: var(--info); color: white; }
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+        .plantuml-code {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 25px 0;
+            line-height: 1.6;
+            white-space: pre-wrap; /* 允许换行 */
+            font-size: 14px;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: #3a57e8;
+        }
+        .step {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .step-number {
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .tip-box {
+            background-color: #e6f7ff;
+            border-left: 6px solid var(--info);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .warning-box {
+            background-color: #fff7e6;
+            border-left: 6px solid var(--warning);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .success-box {
+            background-color: #f6ffed;
+            border-left: 6px solid var(--success);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .diagram-explanation {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .author-info {
+            background: linear-gradient(135deg, #f0f5ff, #e6f2ff);
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--secondary);
+            border-top: 2px solid #eee;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            header { padding: 25px; }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="university-header">
+        <h2>西安邮电大学 · 软件工程实验指导书（4+1视图改进版）</h2>
+        <p>报告设计者和主讲教师：拓守恒 </p>
+    </div>
+    <header>
+        <h1>🎓 基于4+1视图的在线学习管理系统UML建模与分析（Part 1: 场景视图）</h1>
+        <div class="subtitle">
+            <span class="badge badge-primary">4+1视图架构</span>
+            <span class="badge badge-info">UML建模综合应用</span>
+            <span class="badge badge-success">系统设计能力培养</span>
+            <span class="badge badge-warning">👨‍🏫 拓守恒     实验指导书</span>
+        </div>
+    </header>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 </p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <!-- 一、实验背景与目标 -->
+    <div class="card">
+        <h2>📘 一、实验背景与目标</h2>
+        <h3>📌 背景描述</h3>
+        <p>随着在线教育的普及，高校亟需一个功能完善、可扩展、高可用的<strong>在线学习管理系统</strong>（Online Learning Management System, OLMS）。该系统需支持直播授课、录播回放、作业提交、在线考试、社区互动等核心教学场景。</p>
+        <p>为应对高并发、快速迭代和团队协作的挑战，本系统采用<strong>微服务架构</strong>，将系统拆分为多个独立服务（如用户服务、课程服务、直播服务等），每个服务可独立开发、部署和扩展。</p>
+
+        <h3>🎯 实验目标</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            掌握 <strong>4+1 视图模型</strong> 的基本思想与应用场景
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            能够使用 <strong>UML</strong> 对微服务系统进行多视角建模
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            理解不同视图如何协同描述一个复杂软件系统
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            提升面向本科生的 <strong>系统设计能力</strong> 与 <strong>文档撰写能力</strong>
+        </div>
+    </div>
+
+    <!-- 二、4+1视图模型详解（面向初学者） -->
+    <div class="card">
+        <h2>🧩 二、4+1视图模型详解（给初学者的解释）</h2>
+        <p>4+1 视图模型由 Philippe Kruchten 提出，是一种描述软件架构的经典方法。它从 <strong>5 个不同视角</strong> 描述系统，帮助不同角色（用户、开发者、运维）理解他们关心的部分。</p>
+
+        <div class="tip-box">
+            <strong>一个生活化比喻：</strong><br>
+            想象你要建造一座“智能教学大楼”：
+            <ul>
+                <li><strong>场景视图</strong> = 用户使用场景（学生上课、老师讲课）</li>
+                <li><strong>逻辑视图</strong> = 房间功能布局（教室、办公室、实验室）</li>
+                <li><strong>开发视图</strong> = 建筑图纸与材料清单（钢筋、水泥、电路图）</li>
+                <li><strong>进程视图</strong> = 水电暖通运行流程（水流、电流、空调循环）</li>
+                <li><strong>物理视图</strong> = 大楼在城市中的位置与地基（地址、网络、电力接入）</li>
+            </ul>
+        </div>
+
+        <table>
+            <tr>
+                <th>视图名称</th>
+                <th>关注点</th>
+                <th>主要UML图</th>
+                <th>面向角色</th>
+            </tr>
+            <tr>
+                <td><strong>场景视图</strong>（Scenarios）</td>
+                <td>系统“做什么”？用户需求</td>
+                <td>用例图、序列图（特定场景）</td>
+                <td>产品经理、最终用户</td>
+            </tr>
+            <tr>
+                <td><strong>逻辑视图</strong>（Logical）</td>
+                <td>系统内部“功能结构”</td>
+                <td>类图、状态图、活动图</td>
+                <td>系统分析师、架构师</td>
+            </tr>
+            <tr>
+                <td><strong>开发视图</strong>（Development）</td>
+                <td>代码如何组织？模块依赖</td>
+                <td>包图、组件图</td>
+                <td>开发工程师</td>
+            </tr>
+            <tr>
+                <td><strong>进程视图</strong>（Process）</td>
+                <td>运行时“动态行为”</td>
+                <td>序列图、通信图、活动图</td>
+                <td>性能工程师、运维</td>
+            </tr>
+            <tr>
+                <td><strong>物理视图</strong>（Physical）</td>
+                <td>软件如何部署到硬件？</td>
+                <td>部署图</td>
+                <td>系统管理员、DevOps</td>
+            </tr>
+        </table>
+
+        <div class="warning-box">
+            <strong>关键理解：</strong> 场景视图是“1”，它驱动其他“4”个视图的设计。例如，“学生提交作业”这个用例，会驱动逻辑视图中“作业类”的设计、进程视图中“提交流程”的设计等。
+        </div>
+    </div>
+
+    <!-- 三、场景视图建模 -->
+    <div class="card">
+        <h2>🎬 三、场景视图建模：用例驱动的需求分析</h2>
+        <h3>🎯 目标</h3>
+        <p>通过用例图明确系统边界、用户角色和核心功能，为后续设计提供需求输入。</p>
+
+        <h3>🔧 设计步骤详解</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>识别参与者（Actors）</strong>：<br>
+            与系统交互的外部角色。OLMS 系统包含：
+            <ul>
+                <li><strong>学生</strong>：学习课程、提交作业、参加考试</li>
+                <li><strong>教师</strong>：创建课程、直播授课、批改作业</li>
+                <li><strong>助教</strong>：协助批改、答疑</li>
+                <li><strong>管理员</strong>：管理用户、监控系统</li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>识别用例（Use Cases）</strong>：<br>
+            每个参与者希望系统提供的服务。例如“观看直播课程”、“布置作业”。
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>定义用例关系</strong>：
+            <ul>
+                <li><code>《包含》</code>：必须包含的子功能（如“观看直播”必须先“登录”）</li>
+                <li><code>《扩展》</code>：可选扩展功能（如“提问互动”是“观看直播”的可选行为）</li>
+                <li><code>泛化 (Generalization)</code>：用例之间的继承关系（如“观看录播”是“观看课程”的泛化）</li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>绘制用例图</strong>：使用 PlantUML 可视化。
+        </div>
+
+        <h3>📊 系统用例图代码</h3>
+        <div class="plantuml-code" id="usecase-diagram">
+@startuml
+left to right direction
+actor "学生" as Student
+actor "教师" as Teacher
+actor "助教" as TA
+actor "管理员" as Admin
+
+rectangle "在线学习管理系统" {
+  (登录系统) as Login
+  (<<abstract>> 观看课程) as WatchCourse
+  (观看直播课程) as WatchLive
+  (观看录播课程) as WatchRecorded
+  (提交作业) as SubmitAssignment
+  (参加在线考试) as TakeExam
+  (参与社区讨论) as ParticipateForum
+  (查看学习报告) as ViewReport
+  (创建课程) as CreateCourse
+  (直播授课) as LiveTeach
+  (录播授课) as RecordTeach
+  (布置作业) as AssignHomework
+  (批改作业) as GradeHomework
+  (<<manual>> 批改主观题) as GradeSubjective
+  (<<auto>> 批改客观题) as GradeObjective
+  (创建考试) as CreateExam
+  (管理课程资源) as ManageResources
+  (协助批改作业) as AssistGrade
+  (答疑解惑) as AnswerQ
+  (管理讨论区) as ManageForum
+  (管理用户账户) as ManageUsers
+  (分配权限) as AssignPermissions
+  (监控系统状态) as MonitorSystem
+  (备份数据) as BackupData
+  (提问互动) as AskQuestion
+  (查看成绩) as ViewGrade
+  (录制课程) as RecordCourse
+
+  Student --> Login
+  Student --> WatchCourse
+  Student --> SubmitAssignment
+  Student --> TakeExam
+  Student --> ParticipateForum
+  Student --> ViewReport
+
+  Teacher --> Login
+  Teacher --> CreateCourse
+  Teacher --> LiveTeach
+  Teacher --> RecordTeach
+  Teacher --> AssignHomework
+  Teacher --> GradeHomework
+  Teacher --> CreateExam
+  Teacher --> ManageResources
+
+  TA --> Login
+  TA --> AssistGrade
+  TA --> AnswerQ
+  TA --> ManageForum
+
+  Admin --> Login
+  Admin --> ManageUsers
+  Admin --> AssignPermissions
+  Admin --> MonitorSystem
+  Admin --> BackupData
+
+  ' 泛化关系 (Generalization)
+  WatchLive <|-- WatchCourse : 泛化
+  WatchRecorded <|-- WatchCourse : 泛化
+
+  GradeSubjective <|-- GradeHomework : 泛化
+  GradeObjective <|-- GradeHomework : 泛化
+
+  ' Include 关系（必须）
+  WatchCourse ..> Login : 《包含》
+  ParticipateForum ..> Login : 《包含》
+  SubmitAssignment ..> Login : 《包含》
+  TakeExam ..> Login : 《包含》
+
+  ' Extend 关系（可选）
+  AskQuestion ..> WatchLive : 《扩展》
+  ViewGrade ..> SubmitAssignment : 《扩展》
+  ViewGrade ..> TakeExam : 《扩展》
+  RecordCourse ..> LiveTeach : 《扩展》
+
+  ' 额外的 Include 关系
+  LiveTeach ..> CreateCourse : 《包含》
+  RecordTeach ..> CreateCourse : 《包含》
+
+}
+@enduml
+
+</div>
+        <div class="diagram-explanation">
+            <strong>图1-1：OLMS系统用例图（增强版）</strong><br>
+            以下是用于生成用例图的PlantUML代码。通过 <code>《包含》</code> 关系，明确了“登录”是多个用例的前提条件（如观看课程、参与讨论等）；通过 <code>《扩展》</code> 关系，体现了“提问互动”是“观看直播”的可选扩展行为，“查看成绩”是“提交作业”和“参加考试”的可选扩展行为。新增了 <code>泛化关系</code>，如“观看直播课程”和“观看录播课程”是“观看课程”抽象用例的具体实现（基用例）；“批改主观题”和“批改客观题”是“批改作业”基用例的细化。同时引入了 <code>构造型</code>，如 <code><<abstract>></code> 标记“观看课程”为抽象用例，<code><<manual>></code> 标记“批改主观题”为手动处理，<code><<auto>></code> 标记“批改客观题”为自动处理。
+        </div>
+
+        <h3>📝 典型用例详细描述</h3>
+        <p>以“直播授课”为例，说明用例的文本描述规范：</p>
+        <div class="tip-box">
+            <strong>用例名称：</strong> 直播授课<br>
+            <strong>参与者：</strong> 教师<br>
+            <strong>前置条件：</strong> 教师已登录，课程已创建且状态为“进行中”<br>
+            <strong>后置条件：</strong> 直播流已创建，学生收到通知<br>
+            <strong>基本流程：</strong>
+            <ol>
+                <li>教师在课程页面点击“开始直播”</li>
+                <li>系统创建直播流，生成播放URL</li>
+                <li>系统向已选课学生推送“直播开始”通知</li>
+                <li>教师进入直播控制台，开始授课</li>
+            </ol>
+            <strong>备选流程：</strong>
+            <ul>
+                <li>若网络异常，系统提示“直播启动失败”</li>
+                <li>教师可选择“录制课程”作为扩展行为</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 四、场景视图如何驱动其他视图 -->
+    <div class="card">
+        <h2>🔗 四、场景视图如何驱动其他视图？</h2>
+        <p>场景视图是4+1模型的“引擎”。以下是“直播授课”用例如何驱动其他视图设计：</p>
+        <table>
+            <tr>
+                <th>视图</th>
+                <th>由“直播授课”驱动的设计内容</th>
+            </tr>
+            <tr>
+                <td><strong>逻辑视图</strong></td>
+                <td>需设计 <code>LiveStream</code> 类、<code>Course</code> 状态（增加“直播中”）、<code>Notification</code> 类</td>
+            </tr>
+            <tr>
+                <td><strong>开发视图</strong></td>
+                <td>需创建 <code>live-service</code> 微服务模块，包含 Controller/Service/Repository</td>
+            </tr>
+            <tr>
+                <td><strong>进程视图</strong></td>
+                <td>需绘制“直播启动”序列图，涉及前端、直播服务、流媒体服务器、通知服务</td>
+            </tr>
+            <tr>
+                <td><strong>物理视图</strong></td>
+                <td>需部署流媒体服务器（如 WebRTC 服务）、消息队列（用于通知）</td>
+            </tr>
+        </table>
+        <div class="success-box">
+            <strong>记住：</strong> 每个用例都是一个“设计线索”，贯穿整个4+1视图。从用户需求出发，逐步细化到代码和部署，是软件工程的核心思想。
+        </div>
+    </div>
+
+    <!-- 五、给初学者的特别指导 -->
+    <div class="card">
+        <h2>💡 给初学者的特别指导：如何学好场景视图？</h2>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>从“用户故事”开始思考</strong>：<br>
+            不要想技术，先问：“学生想用系统做什么？” 写下 5-10 个用户故事。
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>区分“功能”与“界面”</strong>：<br>
+            “提交作业”是一个功能，“点击按钮”是界面细节，用例应关注前者。
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>正确使用 include/extend/泛化</strong>：<br>
+            <ul>
+                <li><code>《包含》</code> = “没有A就不能做B”（如没有登录就不能看课）</li>
+                <li><code>《扩展》</code> = “在特定条件下，B可以做额外的事”（如看课时可以提问）</li>
+                <li><code>泛化 (Generalization)</code> = “A是B的一种具体实现”（如“观看直播课程”是“观看课程”的具体实现，后者是基用例）</li>
+            </ul>
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>理解构造型 (Stereotypes)</strong>：<br>
+            构造型是UML的扩展机制，用<code><<...>></code>表示，如<code><<abstract>></code>（抽象用例）、<code><<service>></code>（服务用例）等，用于标记用例的特殊性质。在图中，“观看课程”用例被标记为<code><<abstract>></code>，表示它是一个基用例，不能被直接执行，必须通过其具体实现（如“观看直播课程”、“观看录播课程”）来使用。
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <strong>验证用例完整性</strong>：<br>
+            检查是否覆盖所有角色、所有核心业务（创建、读取、更新、删除）。
+        </div>
+    </div>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 </p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <div class="footer">
+        <p>🌟 这是报告的 <strong>第一部分（Part 1）</strong>，完成了场景视图的详细建模。</p>
+        <p>📘 下一部分将深入 <strong>逻辑视图</strong>，从用例推导出类图、状态图和活动图。</p>
+        <p>👨‍🏫 西安邮电大学 · 拓守恒 · 2025</p>
+    </div>
+
+    <script>
+        document.querySelectorAll('.plantuml-code').forEach(codeBlock => {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = '复制';
+            copyBtn.onclick = function() {
+                const code = codeBlock.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    copyBtn.textContent = '已复制！';
+                    setTimeout(() => copyBtn.textContent = '复制', 2000);
+                });
+            };
+            codeBlock.appendChild(copyBtn);
+        });
+    </script>
+</body>
+</html>

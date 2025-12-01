@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 实验：基于4+1视图的在线学习管理系统UML建模与分析（Part 3）</title>
+    <style>
+        :root {
+            --primary: #4a6cf7;
+            --secondary: #6c757d;
+            --success: #52c41a;
+            --warning: #faad14;
+            --danger: #f5222d;
+            --info: #1890ff;
+            --light: #f8f9fa;
+            --dark: #2c3e50;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.7;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), #3a57e8);
+            color: white;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+        .university-header {
+            background-color: #003d7a;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+        }
+        h1 {
+            font-size: 2.4rem;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        h2 {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 1.8rem;
+        }
+        h3 {
+            color: var(--dark);
+            margin-top: 30px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        h4 {
+            color: var(--dark);
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            margin: 15px 0 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .badge-primary { background-color: var(--primary); color: white; }
+        .badge-success { background-color: var(--success); color: white; }
+        .badge-warning { background-color: var(--warning); color: white; }
+        .badge-danger { background-color: var(--danger); color: white; }
+        .badge-info { background-color: var(--info); color: white; }
+        .card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin: 25px 0;
+            box-shadow: var(--box-shadow);
+        }
+        .plantuml-code {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 25px 0;
+            line-height: 1.6;
+            white-space: pre;
+            font-size: 14px;
+            position: relative;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .copy-btn:hover {
+            background: #3a57e8;
+        }
+        .step {
+            position: relative;
+            padding-left: 40px;
+            margin: 30px 0;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .step-number {
+            position: absolute;
+            left: -15px;
+            top: 15px;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .tip-box {
+            background-color: #e6f7ff;
+            border-left: 6px solid var(--info);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .warning-box {
+            background-color: #fff7e6;
+            border-left: 6px solid var(--warning);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .success-box {
+            background-color: #f6ffed;
+            border-left: 6px solid var(--success);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        .diagram-explanation {
+            background-color: #f0f7ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-top: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        .author-info {
+            background: linear-gradient(135deg, #f0f5ff, #e6f2ff);
+            border: 2px solid var(--primary);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            color: var(--secondary);
+            border-top: 2px solid #eee;
+            background: #f8f9fa;
+            border-radius: var(--border-radius);
+        }
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            header { padding: 25px; }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="university-header">
+        <h2>西安邮电大学 · 软件工程实验指导书（4+1视图改进版）</h2>
+        <p>报告设计者和主讲教师：拓守恒 </p>
+    </div>
+    <header>
+        <h1>🎓 基于4+1视图的在线学习管理系统UML建模与分析（Part 3: 开发视图）</h1>
+        <div class="subtitle">
+            <span class="badge badge-primary">4+1视图架构</span>
+            <span class="badge badge-info">UML建模综合应用</span>
+            <span class="badge badge-success">系统设计能力培养</span>
+            <span class="badge badge-warning">👨‍🏫 拓守恒    实验指导书</span>
+        </div>
+    </header>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 教授</p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <!-- 一、开发视图概述 -->
+    <div class="card">
+        <h2>🧱 一、开发视图概述</h2>
+        <h3>🎯 目标与作用</h3>
+        <p><strong>开发视图</strong>（Development View），也称为<strong>模块视图</strong>，关注软件在开发环境下的静态组织结构。它描述了：</p>
+        <ul>
+            <li>源代码如何组织（目录结构、包/模块划分）</li>
+            <li>各模块之间的依赖关系</li>
+            <li>构建、测试、部署的单元</li>
+        </ul>
+        <p>对于 OLMS 微服务系统，开发视图将重点展示每个微服务的内部代码结构，以及服务之间的依赖关系。</p>
+
+        <h3>🔧 开发视图 vs 逻辑视图</h3>
+        <div class="tip-box">
+            <strong>逻辑视图</strong>关注“业务对象是什么”（如 Course、User 类）<br>
+            <strong>开发视图</strong>关注“代码如何组织”（如 course-service/src/main/java/com/olms/course/）<br><br>
+            逻辑视图是“业务语言”，开发视图是“工程语言”。一个逻辑类可能对应多个开发文件（.java, .xml, .yaml）。
+        </div>
+    </div>
+
+    <!-- 二、微服务模块划分原则 -->
+    <div class="card">
+        <h2>📦 二、微服务模块划分原则</h2>
+        <p>开发视图的基础是合理的微服务划分。我们遵循以下原则：</p>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>单一职责原则（SRP）：</strong> 每个微服务只负责一个核心业务领域（如课程服务只管课程）。
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>高内聚低耦合：</strong> 服务内部功能紧密相关，服务之间依赖最小化。
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>数据自治：</strong> 每个服务拥有自己的数据库，避免跨服务直接访问数据库。
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>团队对齐：</strong> 一个服务通常由一个小型开发团队负责（康威定律）。
+        </div>
+
+        <h3>📊 OLMS 系统微服务列表</h3>
+        <table>
+            <tr>
+                <th>微服务名称</th>
+                <th>核心职责</th>
+                <th>技术栈建议</th>
+            </tr>
+            <tr>
+                <td><strong>用户服务</strong>（user-service）</td>
+                <td>用户注册、登录、权限管理</td>
+                <td>Spring Boot + MySQL</td>
+            </tr>
+            <tr>
+                <td><strong>课程服务</strong>（course-service）</td>
+                <td>课程创建、资源管理、选课</td>
+                <td>Spring Boot + PostgreSQL</td>
+            </tr>
+            <tr>
+                <td><strong>直播服务</strong>（live-service）</td>
+                <td>实时直播、互动、流媒体管理</td>
+                <td>Go + WebRTC + Redis</td>
+            </tr>
+            <tr>
+                <td><strong>作业服务</strong>（assignment-service）</td>
+                <td>作业布置、提交、批改、考试</td>
+                <td>Spring Boot + MongoDB</td>
+            </tr>
+            <tr>
+                <td><strong>社区服务</strong>（forum-service）</td>
+                <td>论坛发帖、评论、点赞</td>
+                <td>Node.js + MongoDB</td>
+            </tr>
+            <tr>
+                <td><strong>学习跟踪服务</strong>（tracking-service）</td>
+                <td>行为记录、学习报告生成</td>
+                <td>Python + InfluxDB</td>
+            </tr>
+            <tr>
+                <td><strong>通知服务</strong>（notification-service）</td>
+                <td>消息推送、邮件/SMS提醒</td>
+                <td>Spring Boot + RabbitMQ</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 三、包图建模 -->
+    <div class="card">
+        <h2>🧩 三、包图建模：代码组织结构</h2>
+        <h3>🎯 设计目标</h3>
+        <p>包图（Package Diagram）是开发视图的核心 UML 图，用于展示系统的模块化结构和依赖关系。</p>
+
+        <h3>🔧 设计步骤</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>定义顶层包：</strong> 每个微服务作为一个顶层包。
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>定义内部子包：</strong> 每个微服务内部按分层架构组织（Controller/Service/Repository）。
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>标注依赖关系：</strong> 使用带箭头的虚线表示依赖（A → B 表示 A 依赖 B）。
+        </div>
+
+        <h3>📊 OLMS 系统包图</h3>
+        <div class="plantuml-code" id="package-diagram">@startuml
+' 开发视图 - 包图
+title OLMS 系统包图（开发视图）
+
+package "API网关" {
+  [APIGateway]
+}
+
+package "用户服务" {
+  package "controller" {
+    [UserController]
+  }
+  package "service" {
+    [UserService]
+  }
+  package "repository" {
+    [UserRepository]
+  }
+  package "dto" {
+    [UserDTO]
+  }
+  package "exception" {
+    [UserException]
+  }
+}
+
+package "课程服务" {
+  package "controller" {
+    [CourseController]
+  }
+  package "service" {
+    [CourseService]
+  }
+  package "repository" {
+    [CourseRepository]
+  }
+  package "dto" {
+    [CourseDTO]
+  }
+  package "exception" {
+    [CourseException]
+  }
+}
+
+package "直播服务" {
+  package "controller" {
+    [LiveStreamController]
+  }
+  package "service" {
+    [LiveStreamService]
+  }
+  package "streaming" {
+    [StreamingServer]
+  }
+  package "dto" {
+    [LiveStreamDTO]
+  }
+}
+
+package "作业服务" {
+  package "controller" {
+    [AssignmentController]
+  }
+  package "service" {
+    [AssignmentService]
+  }
+  package "repository" {
+    [SubmissionRepository]
+  }
+  package "dto" {
+    [AssignmentDTO]
+  }
+}
+
+package "社区服务" {
+  package "controller" {
+    [ForumController]
+  }
+  package "service" {
+    [ForumService]
+  }
+  package "repository" {
+    [PostRepository]
+  }
+  package "dto" {
+    [PostDTO]
+  }
+}
+
+package "学习跟踪服务" {
+  package "controller" {
+    [TrackingController]
+  }
+  package "service" {
+    [TrackingService]
+  }
+  package "engine" {
+    [AnalyticsEngine]
+  }
+  package "dto" {
+    [LearningEventDTO]
+  }
+}
+
+package "通知服务" {
+  package "controller" {
+    [NotificationController]
+  }
+  package "service" {
+    [NotificationService]
+  }
+  package "provider" {
+    [EmailProvider]
+    [SmsProvider]
+  }
+  package "queue" {
+    [MessageQueue]
+  }
+}
+
+' 依赖关系
+API网关 --> 用户服务
+API网关 --> 课程服务
+API网关 --> 直播服务
+API网关 --> 作业服务
+API网关 --> 社区服务
+API网关 --> 学习跟踪服务
+API网关 --> 通知服务
+
+课程服务 --> 用户服务 : 依赖 (获取教师/学生信息)
+作业服务 --> 课程服务 : 依赖 (获取课程信息)
+作业服务 --> 用户服务 : 依赖 (获取学生信息)
+学习跟踪服务 --> 课程服务 : 依赖
+学习跟踪 service --> 用户服务 : 依赖
+通知服务 ..> 用户服务 : 异步 (通过消息队列)
+
+note right of 课程服务
+  课程服务依赖用户服务
+  以验证教师身份和
+  获取学生列表
+end note
+
+note right of 通知服务
+  通知服务通过消息队列
+  异步消费用户事件
+  实现解耦
+end note
+
+@enduml</div>
+        <div class="diagram-explanation">
+            <strong>图3-1：OLMS 开发视图 - 包图</strong><br>
+            本图展示了 OLMS 系统的完整代码组织结构。每个微服务是一个独立的包，内部采用标准的分层架构（Controller/Service/Repository/DTO）。API 网关作为统一入口，路由请求到各服务。服务间的依赖关系清晰标注：课程服务依赖用户服务获取用户信息，作业服务依赖课程和用户服务。通知服务通过消息队列异步消费事件，实现松耦合。这种结构便于团队并行开发、独立测试和持续集成。
+        </div>
+    </div>
+
+    <!-- 四、源代码结构示例 -->
+    <div class="card">
+        <h2>📂 四、源代码结构示例（以课程服务为例）</h2>
+        <p>开发视图不仅包括 UML 图，还应包含实际的代码目录结构示例，帮助初学者理解。</p>
+
+        <h3>📊 课程服务目录结构</h3>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; font-size: 14px;">
+course-service/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com.olms.course/
+│   │   │       ├── controller/       # 控制层：接收HTTP请求
+│   │   │       │   └── CourseController.java
+│   │   │       ├── service/          # 业务层：核心逻辑
+│   │   │       │   ├── CourseService.java
+│   │   │       │   └── impl/
+│   │   │       │       └── CourseServiceImpl.java
+│   │   │       ├── repository/       # 数据访问层
+│   │   │       │   └── CourseRepository.java
+│   │   │       ├── dto/              # 数据传输对象
+│   │   │       │   ├── CourseDTO.java
+│   │   │       │   └── EnrollmentDTO.java
+│   │   │       ├── exception/        # 自定义异常
+│   │   │       │   └── CourseNotFoundException.java
+│   │   │       └── CourseApplication.java  # Spring Boot 启动类
+│   │   └── resources/
+│   │       ├── application.yml       # 配置文件
+│   │       ├── bootstrap.yml         # Nacos 配置
+│   │       └── db/
+│   │           └── schema.sql        # 数据库初始化脚本
+├── Dockerfile                        # 容器化构建文件
+├── pom.xml                           # Maven 依赖管理
+└── README.md                         # 服务说明文档
+        </pre>
+
+        <h3>📝 关键文件说明</h3>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>CourseController.java：</strong> 提供 REST API 接口（如 POST /courses）
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>CourseService.java：</strong> 定义业务方法（如 createCourse()）
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>CourseRepository.java：</strong> 封装数据库操作（如 save(), findById()）
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>application.yml：</strong> 配置数据库连接、服务端口、日志级别等
+        </div>
+        <div class="step">
+            <div class="step-number">5</div>
+            <strong>Dockerfile：</strong> 定义如何将服务打包为 Docker 镜像
+        </div>
+    </div>
+
+    <!-- 五、服务间通信机制 -->
+    <div class="card">
+        <h2>📡 五、服务间通信机制</h2>
+        <p>在微服务架构中，服务间通信是开发视图的重要组成部分。OLMS 系统采用两种主要通信方式：</p>
+
+        <h3>1. 同步通信（REST API）</h3>
+        <div class="tip-box">
+            <strong>适用场景：</strong> 需要立即响应的操作（如创建课程时验证教师身份）<br>
+            <strong>实现方式：</strong> 课程服务调用用户服务的 REST API<br>
+            <strong>技术栈：</strong> Spring Cloud OpenFeign / RestTemplate
+        </div>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; font-size: 14px;">
+// 课程服务中调用用户服务
+@FeignClient(name = "user-service")
+public interface UserServiceClient {
+    @GetMapping("/users/{userId}")
+    UserDTO getUserById(@PathVariable String userId);
+    
+    @GetMapping("/users/{userId}/role")
+    String getUserRole(@PathVariable String userId);
+}
+        </pre>
+
+        <h3>2. 异步通信（消息队列）</h3>
+        <div class="tip-box">
+            <strong>适用场景：</strong> 非关键路径、解耦操作（如发送通知、记录日志）<br>
+            <strong>实现方式：</strong> 课程服务发布“课程创建”事件，通知服务订阅该事件<br>
+            <strong>技术栈：</strong> RabbitMQ / Kafka + Spring Cloud Stream
+        </div>
+        <pre style="background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; font-size: 14px;">
+// 课程服务发布事件
+rabbitTemplate.convertAndSend("course.exchange", "course.created", courseEvent);
+
+// 通知服务监听事件
+@RabbitListener(queues = "notification.queue")
+public void handleCourseCreated(CourseEvent event) {
+    notificationService.sendNotification(
+        "新课程上线: " + event.getCourseTitle(),
+        event.getStudentIds()
+    );
+}
+        </pre>
+
+        <div class="warning-box">
+            <strong>关键设计决策：</strong><br>
+            同步通信保证强一致性但增加耦合；异步通信提高可用性但引入最终一致性。OLMS 系统对核心业务（如选课）使用同步，对非核心（如通知）使用异步。
+        </div>
+    </div>
+
+    <!-- 六、给初学者的特别指导 -->
+    <div class="card">
+        <h2>💡 给初学者的特别指导：如何学好开发视图？</h2>
+        <div class="step">
+            <div class="step-number">1</div>
+            <strong>理解“包” vs “类”：</strong><br>
+            包是代码的物理组织（文件夹），类是逻辑概念。一个包包含多个类。
+        </div>
+        <div class="step">
+            <div class="step-number">2</div>
+            <strong>掌握分层架构：</strong><br>
+            Controller（接收请求）→ Service（处理业务）→ Repository（操作数据）是标准模式。
+        </div>
+        <div class="step">
+            <div class="step-number">3</div>
+            <strong>依赖方向很重要：</strong><br>
+            依赖箭头从“使用者”指向“被使用者”。避免循环依赖（A 依赖 B，B 又依赖 A）。
+        </div>
+        <div class="step">
+            <div class="step-number">4</div>
+            <strong>同步 vs 异步：</strong><br>
+            需要立即结果用同步（REST），可延迟处理用异步（消息队列）。
+        </div>
+        <div class="success-box">
+            <strong>记住：</strong> 开发视图是程序员的“地图”。地图画得好，团队开发才不会迷路。先画包图，再写代码！
+        </div>
+    </div>
+
+    <div class="author-info">
+        <p>西安邮电大学 · 软件工程专业</p>
+        <p>实验指导书设计：拓守恒 </p>
+        <p>版权所有 © 2025 西安邮电大学</p>
+    </div>
+
+    <div class="footer">
+        <p>🌟 这是报告的 <strong>第三部分（Part 3）</strong>，完成了开发视图的详细建模。</p>
+        <p>📘 下一部分将深入 <strong>进程视图</strong>，展示系统运行时的动态行为与并发设计。</p>
+        <p>👨‍🏫 西安邮电大学 · 拓守恒 · 2025</p>
+    </div>
+
+    <script>
+        document.querySelectorAll('.plantuml-code').forEach(codeBlock => {
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = '复制';
+            copyBtn.onclick = function() {
+                const code = codeBlock.textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    copyBtn.textContent = '已复制！';
+                    setTimeout(() => copyBtn.textContent = '复制', 2000);
+                });
+            };
+            codeBlock.appendChild(copyBtn);
+        });
+    </script>
+</body>
+</html>
